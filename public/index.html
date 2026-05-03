@@ -175,6 +175,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div class="hright">
       <div class="uchip"><div class="udot"></div><span id="uname">—</span></div>
       <span class="abadge" id="abadge" style="display:none">Admin</span>
+      <button class="btn blogout" onclick="openChangeMdp()" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:white;padding:6px 13px;font-size:12px">🔑 Mot de passe</button>
       <button class="btn blogout" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
@@ -351,6 +352,23 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
+<!-- MODAL CHANGEMENT MOT DE PASSE -->
+<div class="overlay" id="mmdp">
+  <div class="modal" style="max-width:420px">
+    <div class="mtitle">Changer mon mot de passe</div>
+    <div class="msub" id="mmdp-user"></div>
+    <div class="field"><label>Mot de passe actuel</label><input type="password" id="mdp-old" placeholder="••••••••"></div>
+    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="mdp-new" placeholder="••••••••"></div>
+    <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
+    <div id="mdp-error" style="background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none"></div>
+    <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié avec succès !</div>
+    <div class="macts">
+      <button class="btn" onclick="cm('mmdp')">Fermer</button>
+      <button class="btn bp" onclick="changerMdp()">Enregistrer →</button>
+    </div>
+  </div>
+</div>
+
 <script>
 
 let cu=null,cdid=null,ceid=null;
@@ -410,8 +428,43 @@ function showLoader(v){
   el.style.display=v?'flex':'none';
 }
 
+function openChangeMdp(){
+  document.getElementById('mdp-old').value='';
+  document.getElementById('mdp-new').value='';
+  document.getElementById('mdp-confirm').value='';
+  document.getElementById('mdp-error').style.display='none';
+  document.getElementById('mdp-success').style.display='none';
+  document.getElementById('mmdp-user').textContent='Connecté en tant que '+cu.name;
+  document.getElementById('mmdp').classList.add('open');
+}
+
+async function changerMdp(){
+  const old=document.getElementById('mdp-old').value;
+  const nv=document.getElementById('mdp-new').value;
+  const conf=document.getElementById('mdp-confirm').value;
+  const err=document.getElementById('mdp-error');
+  const ok=document.getElementById('mdp-success');
+  err.style.display='none';ok.style.display='none';
+
+  if(old!==cu.pass){err.textContent='Mot de passe actuel incorrect';err.style.display='block';return;}
+  if(nv.length<6){err.textContent='Le nouveau mot de passe doit contenir au moins 6 caractères';err.style.display='block';return;}
+  if(nv!==conf){err.textContent='Les deux mots de passe ne correspondent pas';err.style.display='block';return;}
+
+  try{
+    await fetch(`${SB}/users?id=eq.${cu.id}`,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify({mdp:nv,password:nv})});
+    cu.pass=nv;
+    ok.style.display='block';
+    document.getElementById('mdp-old').value='';
+    document.getElementById('mdp-new').value='';
+    document.getElementById('mdp-confirm').value='';
+    setTimeout(()=>cm('mmdp'),2000);
+  }catch(e){
+    err.textContent='Erreur lors de la mise à jour. Réessayez.';
+    err.style.display='block';
+  }
+}
+
 function syncVueTabs(){
-  const v=document.getElementById('fassign').value;
   document.getElementById('vtab-mes').classList.toggle('active',v===cu.id);
   document.getElementById('vtab-all').classList.toggle('active',v==='');
 }
