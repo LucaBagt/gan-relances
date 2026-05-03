@@ -388,7 +388,7 @@ async function loadAll(){
   showLoader(true);
   try{
     [USERS,PIECES,relances,prevData,flotteData]=await Promise.all([
-      sbGet('users','?select=id,name,mdp,admin,initials&order=name'),
+      sbGet('users','?order=name'),
       sbGet('pieces','?order=nom'),
       sbGet('relances','?order=created_at.desc'),
       sbGet('prevention','?order=created_at.desc'),
