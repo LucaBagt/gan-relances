@@ -399,8 +399,7 @@ async function loadAll(){
     relances=relances.map(r=>({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]}));
     prevData=prevData.map(p=>({...p,types:p.types||[],typesData:p.types_data||{},assign:p.assigned_to,abn:p.assigned_to_name}));
     flotteData=flotteData.map(f=>({...f,assign:f.assigned_to,abn:f.assigned_to_name,historique:f.historique||[]}));
-    USERS=USERS.map(u=>({...u,pass:u.mdp,ini:u.initials}));
-    console.log('USERS chargés:', USERS.length, USERS[0]?.id, USERS[0]?.pass);
+    USERS=USERS.map(u=>({...u,pass:u.mdp||u.password,ini:u.initials}));
   }catch(e){console.error(e);}
   showLoader(false);
 }
