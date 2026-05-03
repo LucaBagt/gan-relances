@@ -1,11 +1,5 @@
 {
-  "functions": {
-    "api/*.js": {
-      "runtime": "@vercel/node@3.0.7"
-    }
-  },
   "rewrites": [
-    { "source": "/api/db/:path*", "destination": "/api/db?path=:path*" },
     { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
