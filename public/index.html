@@ -451,7 +451,6 @@ function showLoader(v){
 function openChangeMdp(){
   if(!cu){return;}
   // Fermer le menu
-  document.getElementById('user-menu').style.display='none';
   // Attendre que le menu soit fermé puis ouvrir la modal
   setTimeout(()=>{
     document.getElementById('mdp-old').value='';
@@ -491,14 +490,12 @@ async function changerMdp(){
   }
 }
 
-function toggleUserMenu(){
   const m=document.getElementById('user-menu');
   m.style.display=m.style.display==='none'?'block':'none';
 }
 // Fermer le menu si on clique ailleurs
 document.addEventListener('click',e=>{
   const menu=document.getElementById('user-menu');
-  if(menu&&!e.target.closest('.uchip')&&!e.target.closest('#user-menu'))menu.style.display='none';
 });
 
 function syncVueTabs(){
@@ -522,7 +519,6 @@ async function doLogin(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('uname').textContent=u.name;
-  document.getElementById('user-menu-name').textContent=u.name+' — '+u.id;
   if(u.admin){document.getElementById('abadge').style.display='inline';document.getElementById('tadmin').style.display='inline-block';}
   buildFilters();buildPG();buildAssign();
   document.getElementById('fassign').value=cu.id;
