@@ -261,11 +261,11 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
-<!-- MODAL NOUVELLE RELANCE -->
+<!-- MODAL NOUVELLE/MODIFIER RELANCE -->
 <div class="overlay" id="mrelance">
   <div class="modal">
-    <div class="mtitle">Nouvelle relance</div>
-    <div class="msub">Renseignez les informations du dossier</div>
+    <div class="mtitle" id="mrelance-title">Nouvelle relance</div>
+    <div class="msub" id="mrelance-sub">Renseignez les informations du dossier</div>
     <div class="r2">
       <div class="field"><label>Client / Société *</label><input type="text" id="rc" placeholder="Nom du client"></div>
       <div class="field"><label>N° Contrat / Dossier</label><input type="text" id="rref" placeholder="Référence"></div>
@@ -275,8 +275,8 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
       <div class="field"><label>Priorité</label>
         <select id="rprio"><option value="urgent">🔴 Urgent</option><option value="normal" selected>🔵 Normal</option><option value="attente">🟡 En attente</option></select>
       </div>
-      <div class="field"><label>Délai (jours)</label>
-        <select id="rdelai"><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select>
+      <div class="field"><label>Échéance</label>
+        <input type="date" id="rech">
       </div>
       <div class="field"><label>Assigner à</label><select id="rassign"></select></div>
     </div>
@@ -284,7 +284,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div class="field"><label>Note interne</label><textarea id="rnote" placeholder="Informations complémentaires..."></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('mrelance')">Annuler</button>
-      <button class="btn bp" onclick="ajouterRelance()">Créer la relance →</button>
+      <button class="btn bp" id="mrelance-btn" onclick="ajouterRelance()">Créer la relance →</button>
     </div>
   </div>
 </div>
@@ -295,6 +295,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div id="detail-content"></div>
     <div class="macts">
       <button class="btn" onclick="cm('mdetail')">Fermer</button>
+      <button class="btn" onclick="cm('mdetail');openModalRelance(cdid)">✏️ Modifier</button>
       <button class="btn bs" onclick="faitDetail()">✓ Marquer traité</button>
       <button class="btn bp" onclick="emailDetail()">✉ Relancer par email</button>
     </div>
@@ -597,9 +598,9 @@ function buildFilters(){
   s.innerHTML='<option value="">Tous collaborateurs</option>';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;s.appendChild(o);});
 }
-function buildAssign(){
+function buildAssign(defaultId=null){
   const s=document.getElementById('rassign');s.innerHTML='';
-  USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if(u.id===cu.id)o.selected=true;s.appendChild(o);});
+  USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((defaultId||cu.id)===u.id)o.selected=true;s.appendChild(o);});
 }
 function buildPG(){
   document.getElementById('pgrid').innerHTML=PIECES.map(p=>`<label class="pcb"><input type="checkbox" value="${p}" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)">${p}</label>`).join('');
@@ -663,6 +664,7 @@ function renderTable(){
       <td onclick="event.stopPropagation()">
         <div class="acts">
           <button class="btn bsm" onclick="openEmailD(${r.id})" title="Email">✉</button>
+          <button class="btn bsm" onclick="event.stopPropagation();openModalRelance(${r.id})" title="Modifier">✏️</button>
           ${ce(r)?`<button class="btn bsm bs" onclick="marquerFait(${r.id})" title="Traité">✓</button><button class="btn bsm" onclick="archiverRelance(${r.id})" title="Archiver" style="background:var(--surface2)">📁</button><button class="btn bsm bd" onclick="suppRelance(${r.id})" title="Supprimer">✕</button>`:''}
         </div>
       </td>
@@ -730,11 +732,30 @@ const MODAL_STYLE='position:fixed;top:0;left:0;width:100vw;height:100vh;backgrou
 function openModal(id){document.getElementById(id).style.cssText=MODAL_STYLE;}
 function cm(id){document.getElementById(id).style.cssText='';document.getElementById(id).classList.remove('open');}
 
-function openModalRelance(){
-  document.querySelectorAll('#pgrid input').forEach(cb=>{cb.checked=false;cb.closest('.pcb').classList.remove('checked');});
-  ['rc','rref','rnote'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rprio').value='normal';document.getElementById('rdelai').value='7';
-  buildAssign();openModal('mrelance');
+let editRelanceId=null;
+
+function openModalRelance(id=null){
+  editRelanceId=id;
+  const r=id?relances.find(x=>x.id===id):null;
+  // Titre et bouton
+  document.getElementById('mrelance-title').textContent=id?'Modifier la relance':'Nouvelle relance';
+  document.getElementById('mrelance-sub').textContent=id?'Modifiez les informations du dossier':'Renseignez les informations du dossier';
+  document.getElementById('mrelance-btn').textContent=id?'Enregistrer les modifications →':'Créer la relance →';
+  // Remplir les champs
+  document.getElementById('rc').value=r?.client||'';
+  document.getElementById('rref').value=r?.ref||'';
+  document.getElementById('remail').value=r?.email||'';
+  document.getElementById('rprio').value=r?.prio||'normal';
+  document.getElementById('rech').value=r?.ech||dn(7);
+  document.getElementById('rnote').value=r?.note||'';
+  // Pièces
+  document.querySelectorAll('#pgrid input').forEach(cb=>{
+    const checked=r?.pieces?.includes(cb.value)||false;
+    cb.checked=checked;
+    cb.closest('.pcb').classList.toggle('checked',checked);
+  });
+  buildAssign(r?.ab);
+  openModal('mrelance');
 }
 
 async function ajouterRelance(){
@@ -743,13 +764,28 @@ async function ajouterRelance(){
   const pieces=Array.from(document.querySelectorAll('#pgrid input:checked')).map(cb=>cb.value);
   if(!pieces.length){alert('Sélectionnez au moins une pièce');return;}
   const email=document.getElementById('remail').value.trim();
-  const delai=parseInt(document.getElementById('rdelai').value);
+  const ech=document.getElementById('rech').value||dn(7);
   const aid=document.getElementById('rassign').value;
   const au=USERS.find(u=>u.id===aid);
-  const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
-  const data={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:dn(delai),statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai,timeline:tl};
-  const res=await sbPost('relances',data);
-  if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
+
+  if(editRelanceId){
+    // MODIFICATION
+    const r=relances.find(x=>x.id===editRelanceId);
+    if(!r)return;
+    r.tl.push({type:'note',action:'Relance modifiée',detail:`Priorité: ${document.getElementById('rprio').value}, Pièces: ${pieces.join(', ')}`,date:dn(0),by:cu.name});
+    const updates={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:ech,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),timeline:r.tl};
+    await sbPatch('relances',editRelanceId,updates);
+    Object.assign(r,{...updates,prio:updates.priorite,ech:updates.echeance,ab:aid,abn:au?.name||cu.name});
+    addLog('Relance modifiée','Client : '+client);
+  }else{
+    // CREATION
+    const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
+    const data={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:ech,statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai:7,timeline:tl};
+    const res=await sbPost('relances',data);
+    if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
+    addLog('Relance créée','Client : '+client);
+  }
+  editRelanceId=null;
   cm('mrelance');renderTable();renderStats();
 }
 
