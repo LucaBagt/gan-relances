@@ -352,22 +352,8 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
-<!-- MODAL CHANGEMENT MOT DE PASSE -->
-<div class="overlay" id="mmdp">
-  <div class="modal" style="max-width:420px">
-    <div class="mtitle">Changer mon mot de passe</div>
-    <div class="msub" id="mmdp-user"></div>
-    <div class="field"><label>Mot de passe actuel</label><input type="password" id="mdp-old" placeholder="••••••••"></div>
-    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="mdp-new" placeholder="••••••••"></div>
-    <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
-    <div id="mdp-error" style="background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none"></div>
-    <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié avec succès !</div>
-    <div class="macts">
-      <button class="btn" onclick="cm('mmdp')">Fermer</button>
-      <button class="btn bp" onclick="changerMdp()">Enregistrer →</button>
-    </div>
-  </div>
-</div>
+
+
 
 <script>
 
@@ -1076,5 +1062,22 @@ function showPage(n){
   if(n==='flotte')renderFlotte();
 }
 </script>
+<!-- MODAL CHANGEMENT MOT DE PASSE -->
+<div class="overlay" id="mmdp">
+  <div class="modal" style="max-width:420px">
+    <div class="mtitle">🔑 Changer mon mot de passe</div>
+    <div class="msub" id="mmdp-user"></div>
+    <div class="field"><label>Mot de passe actuel</label><input type="password" id="mdp-old" placeholder="••••••••"></div>
+    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="mdp-new" placeholder="••••••••"></div>
+    <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
+    <div id="mdp-error" style="background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none"></div>
+    <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié avec succès !</div>
+    <div class="macts">
+      <button class="btn" onclick="cm('mmdp')">Fermer</button>
+      <button class="btn bp" onclick="changerMdp()">Enregistrer →</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
