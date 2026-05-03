@@ -342,6 +342,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
         </div>
       </div>
       <div class="field"><label>Assigner à</label><select id="pv-assign"></select></div>
+      <div class="field"><label>Email client</label><input type="email" id="pv-email" placeholder="email@client.fr"></div>
       <div class="field"><label>Note</label><textarea id="pv-note" placeholder="Observations..."></textarea></div>
       <div class="macts">
         <button class="btn" onclick="cm('mprev')">Annuler</button>
@@ -967,6 +968,7 @@ function openPrev(id=null){
   document.getElementById('pv-client').value=x?.client||'';
   document.getElementById('pv-ref').value=x?.ref||'';
   document.getElementById('pv-note').value=x?.note||'';
+  document.getElementById('pv-email').value=x?.email||'';
   // Réinitialiser toutes les checkboxes
   document.querySelectorAll('#mprev input[type=checkbox]').forEach(cb=>{
     cb.checked=false;cb.closest('.pcb').classList.remove('checked');
@@ -988,7 +990,7 @@ async function savePrev(){
   if(!types.length){alert('Sélectionnez au moins un type de vérification');return;}
   const aid=document.getElementById('pv-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const data={client,ref:document.getElementById('pv-ref').value.trim(),types,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('pv-note').value.trim()};
+  const data={client,ref:document.getElementById('pv-ref').value.trim(),types,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('pv-note').value.trim(),email:document.getElementById('pv-email').value.trim()};
   if(editPrevId){
     const p=prevData.find(x=>x.id===editPrevId);
     if(!p.typesData)p.typesData={};
@@ -1039,9 +1041,10 @@ async function suppPrev(id){
 
 function emailPrev(id){
   const x=prevData.find(p=>p.id===id);if(!x)return;
-  const s=encodeURIComponent(`${x.client} — ${x.type} — Document demandé`);
-  const b=encodeURIComponent(`Bonjour,\n\nDans le cadre du suivi de vos obligations contractuelles, je me permets de vous relancer concernant la transmission du justificatif de ${x.type.toLowerCase()}.\n\nCe document est nécessaire pour garantir la validité de vos garanties assurantielles. Sans ce document, votre couverture pourrait être remise en cause en cas de sinistre.\n\nMerci de bien vouloir nous faire parvenir ce justificatif dans les meilleurs délais.\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
-  window.location.href=`mailto:?subject=${s}&body=${b}`;
+  const typesStr=(x.types||[]).join(', ');
+  const s=encodeURIComponent(`${x.client} — Documents prévention demandés`);
+  const b=encodeURIComponent(`Bonjour,\n\nDans le cadre du suivi de vos obligations contractuelles, je me permets de vous relancer concernant la transmission des justificatifs suivants :\n\n${(x.types||[]).map(t=>'  — '+t).join('\n')}\n\nCes documents sont nécessaires pour garantir la validité de vos garanties assurantielles. Sans ces documents, votre couverture pourrait être remise en cause en cas de sinistre.\n\nMerci de bien vouloir nous faire parvenir ces justificatifs dans les meilleurs délais.\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
+  window.location.href=`mailto:${x.email||''}?subject=${s}&body=${b}`;
 }
 
 // ===== FLOTTE =====
