@@ -185,13 +185,18 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 
   <div class="main">
     <div class="ptabs">
-      <button class="ptab active" onclick="showPage('relances')">📋 Relances</button>
+      <button class="ptab active" onclick="showPage('dashboard')">🏠 Dashboard</button>
+      <button class="ptab" onclick="showPage('relances')">📋 Relances</button>
       <button class="ptab" onclick="showPage('prevention')">🔥 Prévention</button>
       <button class="ptab" onclick="showPage('flotte')">🚗 Flottes</button>
+      <button class="ptab" onclick="showPage('archives')">📁 Archives</button>
+      <button class="ptab" onclick="showPage('stats')">📊 Statistiques</button>
+      <button class="ptab" onclick="showPage('logs')">📜 Activité</button>
       <button class="ptab" onclick="showPage('admin')" id="tadmin" style="display:none">⚙️ Administration</button>
     </div>
 
-    <div id="pane-relances" class="pane active">
+    <div id="pane-dashboard" class="pane active"><div id="dashboard-content"></div></div>
+    <div id="pane-relances" class="pane">
       <div class="stats" id="stats"></div>
       <div class="toolbar">
         <div class="tleft">
@@ -234,6 +239,9 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     </div>
 
     <div id="pane-admin" class="pane"><div id="admin-content"></div></div>
+    <div id="pane-archives" class="pane"><div id="archives-content"></div></div>
+    <div id="pane-stats" class="pane"><div id="stats-content"></div></div>
+    <div id="pane-logs" class="pane"><div id="logs-content"></div></div>
     <div id="pane-prevention" class="pane"><div id="prev-content"></div></div>
     <div id="pane-flotte" class="pane"><div id="flotte-content"></div></div>
     <div id="pane-mdp" class="pane">
@@ -548,7 +556,8 @@ async function doLogin(){
   if(u.admin){document.getElementById('abadge').style.display='inline';document.getElementById('tadmin').style.display='inline-block';}
   buildFilters();buildPG();buildAssign();
   document.getElementById('fassign').value=cu.id;
-  renderTable();renderStats();checkEch();
+  addLog('Connexion','Connexion à l\'application','système');
+  showPage('dashboard');renderStats();checkEch();
 }
 
 function doLogout(){
@@ -633,7 +642,7 @@ function renderTable(){
       <td onclick="event.stopPropagation()">
         <div class="acts">
           <button class="btn bsm" onclick="openEmailD(${r.id})" title="Email">✉</button>
-          ${ce(r)?`<button class="btn bsm bs" onclick="marquerFait(${r.id})" title="Traité">✓</button><button class="btn bsm bd" onclick="suppRelance(${r.id})" title="Supprimer">✕</button>`:''}
+          ${ce(r)?`<button class="btn bsm bs" onclick="marquerFait(${r.id})" title="Traité">✓</button><button class="btn bsm" onclick="archiverRelance(${r.id})" title="Archiver" style="background:var(--surface2)">📁</button><button class="btn bsm bd" onclick="suppRelance(${r.id})" title="Supprimer">✕</button>`:''}
         </div>
       </td>
     </tr>`;
@@ -715,6 +724,7 @@ async function marquerFait(id){
     r.tl.push({type:'note',action:'Dossier traité',detail:'',date:dn(0),by:cu.name});
     await sbPatch('relances',id,{statut:'fait',timeline:r.tl});
     r.stat='fait';
+    addLog('Dossier traité','Client : '+r.client);
   }
   renderTable();renderStats();
 }
@@ -1141,22 +1151,280 @@ function emailFlotte(id){
   window.location.href=`mailto:?subject=${s}&body=${b}`;
 }
 
-// Mise à jour showPage pour les nouveaux modules
+// ===== LOGS =====
+let activityLogs=[];
+function addLog(action,detail,module='relances'){
+  activityLogs.unshift({date:new Date().toISOString(),by:cu?.name||'?',action,detail,module});
+  if(activityLogs.length>500)activityLogs=activityLogs.slice(0,500);
+}
+
+// ===== ARCHIVES =====
+let archives=[];
+
+function archiverRelance(id){
+  const r=relances.find(x=>x.id===id);
+  if(!r)return;
+  r.archived=true;
+  r.archivedDate=dn(0);
+  r.archivedBy=cu.name;
+  archives.unshift({...r,type:'relance'});
+  relances=relances.filter(x=>x.id!==id);
+  addLog('Archivage','Dossier '+r.client+' archivé','relances');
+  renderTable();renderStats();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const today=dn(0);
+  const urgentes=relances.filter(r=>r.stat!=='fait'&&r.prio==='urgent');
+  const echues=relances.filter(r=>r.stat!=='fait'&&isEch(r));
+  const aujRelances=relances.filter(r=>r.ech===today&&r.stat!=='fait');
+  const prevExp=prevData.filter(x=>x.types.some(t=>{const td=x.typesData?.[t];return td?.expiry&&new Date(td.expiry)<new Date();}));
+  const prevBientot=prevData.filter(x=>x.types.some(t=>{const td=x.typesData?.[t];if(!td?.expiry)return false;const d=Math.ceil((new Date(td.expiry)-new Date())/86400000);return d>=0&&d<=30;}));
+  const flotteAlert=flotteData.filter(x=>x.ech&&Math.ceil((new Date(x.ech)-new Date())/86400000)<=parseInt(x.rappel||60));
+  const mesRelances=relances.filter(r=>r.ab===cu.id&&r.stat!=='fait');
+
+  document.getElementById('dashboard-content').innerHTML=`
+    <div style="margin-bottom:20px">
+      <div style="font-family:var(--fd);font-size:22px;font-weight:700;margin-bottom:4px">Bonjour ${cu.name.split(' ')[0]} 👋</div>
+      <div style="font-size:13px;color:var(--muted)">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:24px">
+      <div class="sc sb" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${relances.filter(r=>r.stat!=='fait').length}</div><div class="sl2">Relances en cours</div></div>
+      <div class="sc sr" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${urgentes.length}</div><div class="sl2">Urgentes</div></div>
+      <div class="sc so" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${echues.length}</div><div class="sl2">Échues</div></div>
+      <div class="sc" style="cursor:pointer" onclick="showPage('prevention')"><div class="sn" style="color:var(--danger)">${prevExp.length}</div><div class="sl2">Préventions expirées</div></div>
+      <div class="sc" style="cursor:pointer" onclick="showPage('flotte')"><div class="sn" style="color:var(--warning)">${flotteAlert.length}</div><div class="sl2">Flottes à traiter</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <div class="asec">
+        <div class="atitle">⚡ Mes relances urgentes</div>
+        ${mesRelances.filter(r=>r.prio==='urgent'||isEch(r)).length===0
+          ?'<div class="empty" style="padding:20px">✅ Aucune urgence !</div>'
+          :mesRelances.filter(r=>r.prio==='urgent'||isEch(r)).slice(0,5).map(r=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)" onclick="showPage('relances')" style="cursor:pointer">
+              <span class="badge b${r.prio[0]}">${r.prio}</span>
+              <div style="flex:1"><div style="font-weight:600;font-size:13px">${r.client}</div><div style="font-size:11px;color:var(--muted)">${r.pieces.join(', ')}</div></div>
+              <div style="font-size:11px">${echLabel(r)}</div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📅 Échéances du jour</div>
+        ${[...aujRelances.map(r=>({label:r.client,sub:'Relance — '+r.pieces.join(', '),badge:'📋',module:'relances'})),
+           ...flotteAlert.filter(x=>x.ech===today).map(x=>({label:x.client,sub:'Flotte — '+x.ref,badge:'🚗',module:'flotte'})),
+           ...prevBientot.map(x=>({label:x.client,sub:'Prévention — expire bientôt',badge:'🔥',module:'prevention'}))
+          ].length===0
+          ?'<div class="empty" style="padding:20px">✅ Rien à traiter aujourd\'hui !</div>'
+          :[...aujRelances.map(r=>({label:r.client,sub:'Relance — '+r.pieces.join(', '),badge:'📋',module:'relances'})),
+             ...flotteAlert.filter(x=>x.ech===today).map(x=>({label:x.client,sub:'Flotte — '+x.ref,badge:'🚗',module:'flotte'})),
+             ...prevBientot.map(x=>({label:x.client,sub:'Prévention — expire bientôt',badge:'🔥',module:'prevention'}))
+            ].slice(0,6).map(item=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showPage('${item.module}')">
+              <span style="font-size:18px">${item.badge}</span>
+              <div><div style="font-weight:600;font-size:13px">${item.label}</div><div style="font-size:11px;color:var(--muted)">${item.sub}</div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">🔥 Préventions expirées ou bientôt</div>
+        ${[...prevExp,...prevBientot].length===0
+          ?'<div class="empty" style="padding:20px">✅ Tout est à jour !</div>'
+          :[...prevExp,...prevBientot].slice(0,5).map(x=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showPage('prevention')">
+              <div style="flex:1"><div style="font-weight:600;font-size:13px">${x.client}</div><div style="font-size:11px;color:var(--muted)">${x.types.join(', ')}</div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📜 Dernières actions</div>
+        ${activityLogs.length===0
+          ?'<div class="empty" style="padding:20px">Aucune activité récente</div>'
+          :activityLogs.slice(0,5).map(l=>`
+            <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">${l.action}</span><span style="font-size:11px;color:var(--muted)">${dfmt(l.date.split('T')[0])}</span></div>
+              <div style="font-size:12px;color:var(--muted)">${l.detail} — par ${l.by}</div>
+            </div>`).join('')}
+      </div>
+
+    </div>`;
+}
+
+// ===== ARCHIVES =====
+function renderArchives(){
+  document.getElementById('archives-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">📁 Dossiers archivés (${archives.length})</div>
+      ${archives.length===0
+        ?'<div class="empty">Aucun dossier archivé</div>'
+        :`<div class="tw"><table>
+          <thead><tr><th>Client</th><th>Pièces</th><th>Archivé le</th><th>Par</th><th>Actions</th></tr></thead>
+          <tbody>${archives.map((r,i)=>`
+            <tr>
+              <td><div class="cn">${r.client}</div><div class="cr">${r.ref||'—'}</div></td>
+              <td>${(r.pieces||[]).map(p=>`<span class="ptag">${p}</span>`).join('')}</td>
+              <td>${dfmt(r.archivedDate||dn(0))}</td>
+              <td>${r.archivedBy||'—'}</td>
+              <td><button class="btn bsm bs" onclick="restaurerRelance(${i})">↩ Restaurer</button></td>
+            </tr>`).join('')}
+          </tbody></table></div>`}
+    </div>`;
+}
+
+function restaurerRelance(i){
+  const r=archives[i];
+  if(!confirm('Restaurer ce dossier dans les relances ?'))return;
+  delete r.archived;delete r.archivedDate;delete r.archivedBy;
+  r.stat='ouvert';
+  relances.unshift(r);
+  archives.splice(i,1);
+  addLog('Restauration','Dossier '+r.client+' restauré');
+  renderArchives();renderTable();renderStats();
+}
+
+// ===== STATISTIQUES =====
+function renderStats2(){
+  const mois=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const now=new Date();
+
+  // Stats par collaborateur
+  const userStats=USERS.map(u=>({
+    name:u.name,ini:u.ini||u.initials,
+    crees:relances.filter(r=>r.cb===u.id).length,
+    traites:relances.filter(r=>r.ab===u.id&&r.stat==='fait').length,
+    enCours:relances.filter(r=>r.ab===u.id&&r.stat!=='fait').length,
+    emails:relances.filter(r=>r.ab===u.id).reduce((s,r)=>s+(r.tl||[]).filter(t=>t.type==='email').length,0),
+  }));
+
+  // Stats par mois (6 derniers mois)
+  const last6=Array.from({length:6},(_,i)=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-5+i,1);
+    return {label:mois[d.getMonth()]+' '+d.getFullYear().toString().slice(2),y:d.getFullYear(),m:d.getMonth()};
+  });
+
+  const maxUser=Math.max(...userStats.map(u=>u.crees),1);
+
+  document.getElementById('stats-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">👥 Performance par collaborateur</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>
+            ${['Collaborateur','Relances créées','Assignées','Traitées','Emails envoyés','Taux traitement'].map(h=>`<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border)">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>${userStats.map(u=>{
+            const taux=u.enCours+u.traites>0?Math.round(u.traites/(u.enCours+u.traites)*100):0;
+            return`<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:12px 14px"><div style="display:flex;align-items:center;gap:8px"><div class="av">${u.ini}</div><span style="font-size:13px;font-weight:500">${u.name}</span></div></td>
+              <td style="padding:12px 14px;font-weight:600;color:var(--accent)">${u.crees}</td>
+              <td style="padding:12px 14px">${u.enCours}</td>
+              <td style="padding:12px 14px;color:var(--success);font-weight:600">${u.traites}</td>
+              <td style="padding:12px 14px">${u.emails}</td>
+              <td style="padding:12px 14px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:8px;background:var(--surface2);border-radius:4px">
+                    <div style="width:${taux}%;height:100%;background:${taux>70?'var(--success)':taux>40?'var(--warning)':'var(--danger)'};border-radius:4px"></div>
+                  </div>
+                  <span style="font-size:12px;font-weight:600">${taux}%</span>
+                </div>
+              </td>
+            </tr>`;}).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="asec">
+        <div class="atitle">📈 Répartition par priorité</div>
+        ${['urgent','normal','attente'].map(p=>{
+          const n=relances.filter(r=>r.prio===p&&r.stat!=='fait').length;
+          const total=relances.filter(r=>r.stat!=='fait').length||1;
+          const pct=Math.round(n/total*100);
+          const colors={urgent:'var(--danger)',normal:'var(--accent)',attente:'var(--warning)'};
+          const labels={urgent:'Urgent',normal:'Normal',attente:'En attente'};
+          return`<div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:500">${labels[p]}</span>
+              <span style="font-size:13px;font-weight:600">${n} (${pct}%)</span>
+            </div>
+            <div style="height:10px;background:var(--surface2);border-radius:5px">
+              <div style="width:${pct}%;height:100%;background:${colors[p]};border-radius:5px"></div>
+            </div>
+          </div>`;}).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📊 Résumé global</div>
+        ${[
+          {l:'Total relances créées',v:relances.length,c:'var(--accent)'},
+          {l:'Traitées avec succès',v:relances.filter(r=>r.stat==='fait').length,c:'var(--success)'},
+          {l:'Archivées',v:archives.length,c:'var(--muted)'},
+          {l:'Emails envoyés',v:relances.reduce((s,r)=>s+(r.tl||[]).filter(t=>t.type==='email').length,0),c:'var(--accent)'},
+          {l:'Suivis prévention',v:prevData.length,c:'var(--warning)'},
+          {l:'Contrats flotte',v:flotteData.length,c:'var(--accent)'},
+        ].map(s=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px">${s.l}</span>
+            <span style="font-size:18px;font-weight:700;font-family:var(--fd);color:${s.c}">${s.v}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ===== LOGS D'ACTIVITE =====
+function renderLogs(){
+  // Collecter tous les événements depuis les timelines
+  const allEvents=[];
+  relances.forEach(r=>{
+    (r.tl||[]).forEach(t=>{
+      allEvents.push({date:t.date,by:t.by,action:t.action,detail:t.detail||'',client:r.client,module:'📋 Relance'});
+    });
+  });
+  activityLogs.forEach(l=>{
+    allEvents.push({date:l.date.split('T')[0],by:l.by,action:l.action,detail:l.detail,client:'',module:'🗂 Système'});
+  });
+  allEvents.sort((a,b)=>b.date.localeCompare(a.date));
+
+  document.getElementById('logs-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">📜 Journal d'activité (${allEvents.length} événements)</div>
+      ${allEvents.length===0?'<div class="empty">Aucune activité enregistrée</div>':`
+      <div class="tw"><table>
+        <thead><tr><th>Date</th><th>Module</th><th>Client</th><th>Action</th><th>Par</th></tr></thead>
+        <tbody>${allEvents.slice(0,100).map(e=>`
+          <tr>
+            <td style="font-size:12px;white-space:nowrap">${dfmt(e.date)}</td>
+            <td><span style="font-size:12px">${e.module}</span></td>
+            <td><span style="font-size:13px;font-weight:500">${e.client||'—'}</span></td>
+            <td><div style="font-size:13px">${e.action}</div>${e.detail?`<div style="font-size:11px;color:var(--muted)">${e.detail}</div>`:''}</td>
+            <td><div style="font-size:12px;color:var(--accent)">${e.by}</div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`}
+    </div>`;
+}
+
+// Mise à jour showPage
 function showPage(n){
-  const pages=['relances','prevention','flotte','admin','mdp'];
+  const pages=['dashboard','relances','prevention','flotte','archives','stats','logs','admin','mdp'];
   document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',pages[i]===n));
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+n).classList.add('active');
+  if(n==='dashboard')renderDashboard();
   if(n==='admin')renderAdmin();
   if(n==='prevention')renderPrevention();
   if(n==='flotte')renderFlotte();
+  if(n==='archives')renderArchives();
+  if(n==='stats')renderStats2();
+  if(n==='logs')renderLogs();
   if(n==='mdp'){
     document.getElementById('mdp-id').value=cu?.id||'';
-    document.getElementById('mdp-old').value='';
-    document.getElementById('mdp-new').value='';
-    document.getElementById('mdp-confirm').value='';
-    document.getElementById('mdp-error').style.display='none';
-    document.getElementById('mdp-success').style.display='none';
+    ['mdp-old','mdp-new','mdp-confirm'].forEach(id=>document.getElementById(id).value='');
+    ['mdp-error','mdp-success'].forEach(id=>document.getElementById(id).style.display='none');
   }
 }
 </script>
