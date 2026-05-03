@@ -571,8 +571,13 @@ async function doLogin(){
   const id=document.getElementById('lu').value.trim().toUpperCase();
   const pass=document.getElementById('lp').value;
   if(!USERS.length)await loadAll();
-  const u=USERS.find(x=>x.id===id&&x.pass===pass);
+  const u=USERS.find(x=>x.id===id&&(x.pass===pass||x.mdp===pass||x.password===pass));
   if(!u){document.getElementById('lerr').style.display='block';return;}
+  localStorage.setItem('gan_session',JSON.stringify({id:u.id,pass:u.pass||u.mdp||u.password}));
+  await connectUser(u);
+}
+
+async function connectUser(u){
   cu=u;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
@@ -584,7 +589,20 @@ async function doLogin(){
   showPage('dashboard');renderStats();checkEch();
 }
 
+// Restaurer la session au chargement
+async function restoreSession(){
+  try{
+    const sess=localStorage.getItem('gan_session');
+    if(!sess)return;
+    const {id,pass}=JSON.parse(sess);
+    if(!USERS.length)await loadAll();
+    const u=USERS.find(x=>x.id===id&&x.pass===pass);
+    if(u)await connectUser(u);
+  }catch(e){localStorage.removeItem('gan_session');}
+}
+
 function doLogout(){
+  localStorage.removeItem('gan_session');
   cu=null;
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').classList.remove('visible');
@@ -872,6 +890,9 @@ function checkEch(){
   if(f.length>0)setTimeout(()=>{if(confirm(`🚗 ${f.length} contrat(s) flotte arrivant à échéance :\n\n${f.map(x=>`• ${x.client} — ${x.ref}`).join('\n')}\n\nConsulter ?`)){showPage('flotte');}},1800);
 }
 setInterval(checkEch,3600000);
+
+// Restaurer la session au chargement de la page
+loadAll().then(()=>restoreSession());
 
 // ===== PREVENTION =====
 let editPrevId=null;
