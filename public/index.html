@@ -663,7 +663,11 @@ function openDetail(id){
       <div class="dmi"><div class="dmil">Échéance</div><div class="dmiv">${echLabel(r)}</div></div>
       <div class="dmi"><div class="dmil">Relances envoyées</div><div class="dmiv" style="color:var(--accent)">${r.tl.filter(t=>t.type==='email').length}</div></div>
       <div class="dmi"><div class="dmil">Créé par</div><div class="dmiv" style="font-size:12px">${r.cbn}</div></div>
-      <div class="dmi"><div class="dmil">Assigné à</div><div class="dmiv" style="font-size:12px;color:var(--success)">${r.abn}</div></div>
+      <div class="dmi"><div class="dmil">Assigné à</div><div class="dmiv">
+        <select onchange="reassignerRelance(${r.id},this.value)" style="font-size:12px;padding:4px 8px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);background:white;color:var(--success);font-weight:600">
+          ${USERS.map(u=>`<option value="${u.id}" ${u.id===r.ab?'selected':''}>${u.name}</option>`).join('')}
+        </select>
+      </div></div>
       <div class="dmi"><div class="dmil">Dernière action</div><div class="dmiv" style="font-size:12px">${r.tl.length?dfmt(r.tl[r.tl.length-1].date):'—'}</div></div>
     </div>
     <div style="margin-bottom:18px"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px">Pièces manquantes</div><div>${r.pieces.map(p=>`<span class="ptag" style="font-size:13px;padding:5px 11px">${p}</span>`).join('')}</div></div>
@@ -671,6 +675,16 @@ function openDetail(id){
     ${r.tl.map(t=>`<div class="tl-item"><div class="tl-dot tl-${t.type}">${icons[t.type]||'•'}</div><div class="tl-box"><div class="tl-top"><span class="tl-action">${t.action}</span><span class="tl-date">${dfmt(t.date)}</span></div>${t.detail?`<div class="tl-detail">${t.detail}</div>`:''}<div class="tl-by">par ${t.by}</div></div></div>`).join('')}
     <div class="note-row"><textarea id="ninput" placeholder="Ajouter une note interne..."></textarea><button class="btn bp bsm" onclick="ajouterNote(${r.id})" style="align-self:flex-end;white-space:nowrap">+ Note</button></div>`;
   openModal('mdetail');
+}
+
+async function reassignerRelance(id, newUserId){
+  const r=relances.find(x=>x.id===id);
+  const u=USERS.find(x=>x.id===newUserId);
+  if(!r||!u)return;
+  r.ab=newUserId;r.abn=u.name;
+  r.tl.push({type:'note',action:'Réassignation',detail:`Assigné à ${u.name}`,date:dn(0),by:cu.name});
+  await sbPatch('relances',id,{assigned_to:newUserId,assigned_to_name:u.name,timeline:r.tl});
+  openDetail(id);renderTable();
 }
 
 async function ajouterNote(id){
