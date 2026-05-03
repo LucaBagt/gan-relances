@@ -358,21 +358,23 @@ function dn(d=0){const x=new Date();x.setDate(x.getDate()+d);return x.toISOStrin
 function dfmt(d){return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
 
 // ===== SUPABASE =====
-const SB='/api/db';
+const SB='https://eqrltvqfuiznemhzjbez.supabase.co/rest/v1';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxcmx0dnFmdWl6bmVtaHpqYmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MTM5MTgsImV4cCI6MjA5MzM4OTkxOH0.nmP8C7QvKIEvDhC5y0w9POKmdvJ1-NEMkqkcY8EH4UM';
+const SB_HEADERS={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
 async function sbGet(table,params=''){
-  const r=await fetch(`${SB}/${table}${params}`,{headers:{'Content-Type':'application/json'}});
+  const r=await fetch(`${SB}/${table}${params}`,{headers:SB_HEADERS});
   return r.json();
 }
 async function sbPost(table,data){
-  const r=await fetch(`${SB}/${table}`,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(data)});
+  const r=await fetch(`${SB}/${table}`,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify(data)});
   return r.json();
 }
 async function sbPatch(table,id,data){
-  const r=await fetch(`${SB}/${table}?id=eq.${id}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(data)});
+  const r=await fetch(`${SB}/${table}?id=eq.${id}`,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify(data)});
   return r.json();
 }
 async function sbDelete(table,id){
-  await fetch(`${SB}/${table}?id=eq.${id}`,{method:'DELETE',headers:{'Content-Type':'application/json'}});
+  await fetch(`${SB}/${table}?id=eq.${id}`,{method:'DELETE',headers:SB_HEADERS});
 }
 
 let USERS=[];
