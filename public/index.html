@@ -441,16 +441,20 @@ function showLoader(v){
 }
 
 function openChangeMdp(){
-  if(!cu){alert('Veuillez vous connecter d\'abord');return;}
-  // Fermer toutes les autres modals
-  document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));
-  document.getElementById('mdp-old').value='';
-  document.getElementById('mdp-new').value='';
-  document.getElementById('mdp-confirm').value='';
-  document.getElementById('mdp-error').style.display='none';
-  document.getElementById('mdp-success').style.display='none';
-  document.getElementById('mmdp-user').textContent='Connecté en tant que '+cu.name;
-  document.getElementById('mmdp').classList.add('open');
+  if(!cu){return;}
+  // Fermer le menu
+  document.getElementById('user-menu').style.display='none';
+  // Attendre que le menu soit fermé puis ouvrir la modal
+  setTimeout(()=>{
+    document.getElementById('mdp-old').value='';
+    document.getElementById('mdp-new').value='';
+    document.getElementById('mdp-confirm').value='';
+    document.getElementById('mdp-error').style.display='none';
+    document.getElementById('mdp-success').style.display='none';
+    document.getElementById('mmdp-user').textContent='Connecté en tant que '+cu.name;
+    const m=document.getElementById('mmdp');
+    m.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+  },100);
 }
 
 async function changerMdp(){
@@ -648,7 +652,11 @@ async function faitDetail(){
 
 function emailDetail(){cm('mdetail');openEmailD(cdid);}
 
-function cm(id){document.getElementById(id).classList.remove('open');}
+function cm(id){
+  const el=document.getElementById(id);
+  if(id==='mmdp'){el.style.cssText='';}
+  el.classList.remove('open');
+}
 
 function openModalRelance(){
   document.querySelectorAll('#pgrid input').forEach(cb=>{cb.checked=false;cb.closest('.pcb').classList.remove('checked');});
