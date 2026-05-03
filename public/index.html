@@ -639,7 +639,7 @@ function openDetail(id){
     <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Historique des actions</div>
     ${r.tl.map(t=>`<div class="tl-item"><div class="tl-dot tl-${t.type}">${icons[t.type]||'•'}</div><div class="tl-box"><div class="tl-top"><span class="tl-action">${t.action}</span><span class="tl-date">${dfmt(t.date)}</span></div>${t.detail?`<div class="tl-detail">${t.detail}</div>`:''}<div class="tl-by">par ${t.by}</div></div></div>`).join('')}
     <div class="note-row"><textarea id="ninput" placeholder="Ajouter une note interne..."></textarea><button class="btn bp bsm" onclick="ajouterNote(${r.id})" style="align-self:flex-end;white-space:nowrap">+ Note</button></div>`;
-  document.getElementById('mdetail').classList.add('open');
+  openModal('mdetail');
 }
 
 async function ajouterNote(id){
@@ -660,17 +660,15 @@ async function faitDetail(){
 
 function emailDetail(){cm('mdetail');openEmailD(cdid);}
 
-function cm(id){
-  const el=document.getElementById(id);
-  if(id==='mmdp'){el.style.cssText='';}
-  el.classList.remove('open');
-}
+const MODAL_STYLE='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+function openModal(id){document.getElementById(id).style.cssText=MODAL_STYLE;}
+function cm(id){document.getElementById(id).style.cssText='';document.getElementById(id).classList.remove('open');}
 
 function openModalRelance(){
   document.querySelectorAll('#pgrid input').forEach(cb=>{cb.checked=false;cb.closest('.pcb').classList.remove('checked');});
   ['rc','rref','rnote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('rprio').value='normal';document.getElementById('rdelai').value='7';
-  buildAssign();document.getElementById('mrelance').classList.add('open');
+  buildAssign();openModal('mrelance');
 }
 
 async function ajouterRelance(){
@@ -712,7 +710,7 @@ function openEmailD(id){
   document.getElementById('eto').value='';
   document.getElementById('esubj').value=`Dossier ${r.client}${r.ref?' ('+r.ref+')':''} — Documents manquants`;
   document.getElementById('ebody').value=emailBody(r.pieces,r.delai);
-  document.getElementById('memail').classList.add('open');
+  openModal('memail');
 }
 
 async function envoyerEmail(){
@@ -903,7 +901,7 @@ function openPrev(id=null){
   });
   const sel=document.getElementById('pv-assign');sel.innerHTML='';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((x?.assign||cu.id)===u.id)o.selected=true;sel.appendChild(o);});
-  document.getElementById('mprev').classList.add('open');
+  openModal('mprev');
 }
 
 async function savePrev(){
@@ -1051,7 +1049,7 @@ function openFlotte(id=null){
   document.getElementById('fl-note').value=x?.note||'';
   const sel=document.getElementById('fl-assign');sel.innerHTML='';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((x?.assign||cu.id)===u.id)o.selected=true;sel.appendChild(o);});
-  document.getElementById('mflotte').classList.add('open');
+  openModal('mflotte');
 }
 
 async function saveFlotte(){
