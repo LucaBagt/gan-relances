@@ -555,6 +555,8 @@ function exportExcel(){
 }
 
 function syncVueTabs(){
+  const v=document.getElementById('fassign').value;
+  document.getElementById('vtab-mes').classList.toggle('active',v===cu.id);
   document.getElementById('vtab-all').classList.toggle('active',v==='');
 }
 
