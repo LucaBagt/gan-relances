@@ -403,6 +403,26 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 <script>
 
 let cu=null,cdid=null,ceid=null;
+
+const ETPLS={
+  'Permis de conduire':'je me permets de vous relancer concernant la transmission de votre permis de conduire (recto-verso) nécessaire à la finalisation de votre dossier.',
+  'Carte d\'identité':'je me permets de vous relancer concernant la copie de votre pièce d\'identité (recto-verso) indispensable pour la mise en place de votre contrat.',
+  'RIB / IBAN':'je me permets de vous relancer concernant votre relevé d\'identité bancaire (RIB/IBAN) nécessaire au prélèvement de vos cotisations.',
+  'Kbis':'je me permets de vous relancer concernant l\'extrait Kbis de votre société, document obligatoire pour l\'établissement de votre contrat professionnel.',
+  'Devis signé':'je me permets de vous relancer concernant la signature et le retour du devis que je vous ai adressé.',
+  'Lettre de devoir de conseil':'je me permets de vous relancer concernant la signature et le retour de la lettre de devoir de conseil jointe à votre dossier.',
+  'Carte grise':'je me permets de vous relancer concernant la copie de la carte grise du véhicule assuré.',
+  'Relevé d\'information':'je me permets de vous relancer concernant votre relevé d\'information auprès de votre précédent assureur.',
+  'PV de restitution':'je me permets de vous relancer concernant le procès-verbal de restitution nécessaire au retrait du véhicule de votre flotte.',
+  'Bilan comptable':'je me permets de vous relancer concernant votre bilan comptable nécessaire à la régularisation de votre contrat.',
+};
+
+function emailBody(pieces,delai){
+  const fp=pieces&&pieces[0];
+  const t=ETPLS[fp]||`je me permets de vous relancer concernant les documents suivants : ${(pieces||[]).join(', ')}.`;
+  const list=pieces&&pieces.length>1?'\n\nDocuments attendus :\n'+pieces.map(p=>'  — '+p).join('\n'):'';
+  return `Bonjour,\n\n${t}${list}\n\nSans retour de votre part sous ${delai||7} jours, nous pourrions être dans l'impossibilité de traiter votre dossier dans les meilleurs délais.\n\nRestant à votre disposition pour tout renseignement complémentaire.\n\nBien cordialement,\n\n${cu?.name||'Luca BAGATELLA'}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`;
+}
 function dn(d=0){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0];}
 function dfmt(d){return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
 
