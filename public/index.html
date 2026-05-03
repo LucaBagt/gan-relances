@@ -415,6 +415,7 @@ function showLoader(v){
 }
 
 function openChangeMdp(){
+  if(!cu){alert('Veuillez vous connecter d\'abord');return;}
   document.getElementById('mdp-old').value='';
   document.getElementById('mdp-new').value='';
   document.getElementById('mdp-confirm').value='';
