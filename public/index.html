@@ -174,18 +174,12 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div class="hleft"><div class="hmark">G</div><div class="htitle">Pilotage Relances — GAN Fronton</div></div>
     <div class="hright">
       <span class="abadge" id="abadge" style="display:none">Admin</span>
-      <div style="position:relative">
-        <div class="uchip" onclick="toggleUserMenu()" style="cursor:pointer">
-          <div class="udot"></div>
-          <span id="uname">—</span>
-          <span style="font-size:10px;margin-left:2px">▼</span>
-        </div>
-        <div id="user-menu" style="display:none;position:absolute;right:0;top:42px;background:white;border-radius:var(--rs);box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:180px;z-index:2000;overflow:hidden">
-          <div style="padding:10px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)" id="user-menu-name"></div>
-          <button onclick="toggleUserMenu();openChangeMdp()" style="display:block;width:100%;padding:11px 14px;text-align:left;background:none;border:none;font-size:13px;color:var(--text);cursor:pointer;font-family:var(--fb)" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">🔑 Changer mon mot de passe</button>
-          <button onclick="doLogout()" style="display:block;width:100%;padding:11px 14px;text-align:left;background:none;border:none;font-size:13px;color:#C0392B;cursor:pointer;font-family:var(--fb)" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">↩ Déconnexion</button>
-        </div>
+      <div class="uchip" onclick="showPage('mdp')" style="cursor:pointer">
+        <div class="udot"></div>
+        <span id="uname">—</span>
+        <span style="font-size:10px;margin-left:4px">🔑</span>
       </div>
+      <button class="btn blogout" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
 
@@ -241,6 +235,20 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div id="pane-admin" class="pane"><div id="admin-content"></div></div>
     <div id="pane-prevention" class="pane"><div id="prev-content"></div></div>
     <div id="pane-flotte" class="pane"><div id="flotte-content"></div></div>
+    <div id="pane-mdp" class="pane">
+      <div style="max-width:400px;margin:0 auto">
+        <div class="asec">
+          <div class="atitle">🔑 Changer mon mot de passe</div>
+          <div class="field"><label>Identifiant</label><input type="text" id="mdp-id" disabled style="background:var(--surface2);color:var(--muted)"></div>
+          <div class="field"><label>Mot de passe actuel</label><input type="password" id="mdp-old" placeholder="••••••••"></div>
+          <div class="field"><label>Nouveau mot de passe</label><input type="password" id="mdp-new" placeholder="••••••••"></div>
+          <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
+          <div id="mdp-error" style="background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none"></div>
+          <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié avec succès !</div>
+          <button class="btn bp" onclick="changerMdp()" style="width:100%;justify-content:center">Enregistrer le nouveau mot de passe</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1100,13 +1108,21 @@ function emailFlotte(id){
 
 // Mise à jour showPage pour les nouveaux modules
 function showPage(n){
-  const pages=['relances','prevention','flotte','admin'];
+  const pages=['relances','prevention','flotte','admin','mdp'];
   document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',pages[i]===n));
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+n).classList.add('active');
   if(n==='admin')renderAdmin();
   if(n==='prevention')renderPrevention();
   if(n==='flotte')renderFlotte();
+  if(n==='mdp'){
+    document.getElementById('mdp-id').value=cu?.id||'';
+    document.getElementById('mdp-old').value='';
+    document.getElementById('mdp-new').value='';
+    document.getElementById('mdp-confirm').value='';
+    document.getElementById('mdp-error').style.display='none';
+    document.getElementById('mdp-success').style.display='none';
+  }
 }
 </script>
 
