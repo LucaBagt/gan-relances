@@ -219,6 +219,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
           </select>
         </div>
         <button class="btn bp" onclick="openModalRelance()">+ Nouvelle relance</button>
+        <button class="btn" onclick="exportExcel()" title="Exporter en Excel">📥 Export</button>
       </div>
       <div class="tw">
         <table>
@@ -261,6 +262,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
       <div class="field"><label>Client / Société *</label><input type="text" id="rc" placeholder="Nom du client"></div>
       <div class="field"><label>N° Contrat / Dossier</label><input type="text" id="rref" placeholder="Référence"></div>
     </div>
+    <div class="field"><label>Email client</label><input type="email" id="remail" placeholder="email@client.fr"></div>
     <div class="r3">
       <div class="field"><label>Priorité</label>
         <select id="rprio"><option value="urgent">🔴 Urgent</option><option value="normal" selected>🔵 Normal</option><option value="attente">🟡 En attente</option></select>
@@ -492,6 +494,36 @@ async function changerMdp(){
 }
 
 
+// ===== FILTRES MES/TOUS PREVENTION & FLOTTE =====
+function setPrevVue(v){
+  document.getElementById('pvtab-mes')?.classList.toggle('active',v==='mes');
+  document.getElementById('pvtab-all')?.classList.toggle('active',v==='all');
+  const sel=document.getElementById('prev-fassign');
+  if(sel)sel.value=v==='mes'?cu.id:'';
+  renderPrevention();
+}
+function setFltVue(v){
+  document.getElementById('flttab-mes')?.classList.toggle('active',v==='mes');
+  document.getElementById('flttab-all')?.classList.toggle('active',v==='all');
+  const sel=document.getElementById('flt-assign');
+  if(sel)sel.value=v==='mes'?cu.id:'';
+  renderFlotte();
+}
+
+// ===== EXPORT EXCEL =====
+function exportExcel(){
+  const rows=[['Client','Référence','Pièces','Priorité','Échéance','Créé par','Assigné à','Statut','Nb relances']];
+  relances.forEach(r=>{
+    rows.push([r.client,r.ref||'',r.pieces.join(', '),r.prio,r.ech||'',r.cbn,r.abn,r.stat,r.tl.filter(t=>t.type==='email').length]);
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='relances_gan_'+dn(0)+'.csv';
+  a.click();
+}
+
 function syncVueTabs(){
   document.getElementById('vtab-all').classList.toggle('active',v==='');
 }
@@ -666,11 +698,12 @@ async function ajouterRelance(){
   if(!client){alert('Client obligatoire');return;}
   const pieces=Array.from(document.querySelectorAll('#pgrid input:checked')).map(cb=>cb.value);
   if(!pieces.length){alert('Sélectionnez au moins une pièce');return;}
+  const email=document.getElementById('remail').value.trim();
   const delai=parseInt(document.getElementById('rdelai').value);
   const aid=document.getElementById('rassign').value;
   const au=USERS.find(u=>u.id===aid);
   const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
-  const data={client,ref:document.getElementById('rref').value.trim(),pieces,priorite:document.getElementById('rprio').value,echeance:dn(delai),statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai,timeline:tl};
+  const data={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:dn(delai),statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai,timeline:tl};
   const res=await sbPost('relances',data);
   if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
   cm('mrelance');renderTable();renderStats();
@@ -697,7 +730,7 @@ function openEmailD(id){
   const r=relances.find(x=>x.id===id);if(!r)return;
   ceid=id;
   document.getElementById('emailsub').textContent=`Relance pour ${r.client} — ${r.pieces.join(', ')}`;
-  document.getElementById('eto').value='';
+  document.getElementById('eto').value=r.email||'';
   document.getElementById('esubj').value=`Dossier ${r.client}${r.ref?' ('+r.ref+')':''} — Documents manquants`;
   document.getElementById('ebody').value=emailBody(r.pieces,r.delai);
   openModal('memail');
@@ -772,9 +805,11 @@ function renderPrevention(){
   const search=document.getElementById('prev-search')?.value.toLowerCase()||'';
   const fstat=document.getElementById('prev-fstat')?.value||'';
   const ftype=document.getElementById('prev-ftype')?.value||'';
+  const fassign=document.getElementById('prev-fassign')?.value||'';
 
   let list=prevData.filter(x=>{
     if(search&&!x.client.toLowerCase().includes(search))return false;
+    if(fassign&&x.assign!==fassign)return false;
     if(ftype&&!x.types.includes(ftype))return false;
     const sg=statGlobal(x);
     const hasExpire=x.types.some(t=>{const td=x.typesData?.[t];return td?.stat==='recu'&&td?.expiry&&new Date(td.expiry)<new Date();});
@@ -816,6 +851,10 @@ function renderPrevention(){
     </div>
     <div class="toolbar">
       <div class="tleft">
+        <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
+          <button id="pvtab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setPrevVue('mes')">👤 Mes suivis</button>
+          <button id="pvtab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setPrevVue('all')">🌐 Tous</button>
+        </div>
         <input class="sinput" type="text" placeholder="🔍 Rechercher..." oninput="renderPrevention()" id="prev-search">
         <select class="fsel" onchange="renderPrevention()" id="prev-fstat">
           <option value="">Tous statuts</option>
@@ -831,6 +870,10 @@ function renderPrevention(){
           <option value="Thermographie">🌡️ Thermographie</option>
           <option value="Rapport sécurité incendie">🔥 Sécurité incendie</option>
           <option value="Exutoire de fumées">💨 Exutoire fumées</option>
+        </select>
+        <select class="fsel" onchange="renderPrevention()" id="prev-fassign">
+          <option value="">Tous collaborateurs</option>
+          ${USERS.map(u=>`<option value="${u.id}"${u.id===cu.id?' selected':''}>${u.name}</option>`).join('')}
         </select>
       </div>
       <button class="btn bp" onclick="openPrev()">+ Nouveau suivi</button>
@@ -990,6 +1033,10 @@ function renderFlotte(){
     </div>
     <div class="toolbar">
       <div class="tleft">
+        <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
+          <button id="flttab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setFltVue('mes')">👤 Mes contrats</button>
+          <button id="flttab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setFltVue('all')">🌐 Tous</button>
+        </div>
         <input class="sinput" type="text" placeholder="🔍 Rechercher..." oninput="renderFlotte()" id="flt-search">
         <select class="fsel" onchange="renderFlotte()" id="flt-assign">
           <option value="">Tous collaborateurs</option>
