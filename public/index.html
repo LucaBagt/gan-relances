@@ -388,7 +388,7 @@ async function loadAll(){
   showLoader(true);
   try{
     [USERS,PIECES,relances,prevData,flotteData]=await Promise.all([
-      sbGet('users','?select=id,name,password,admin,initials&order=name'),
+      sbGet('users','?select=id,name,mdp,admin,initials&order=name'),
       sbGet('pieces','?order=nom'),
       sbGet('relances','?order=created_at.desc'),
       sbGet('prevention','?order=created_at.desc'),
@@ -399,8 +399,8 @@ async function loadAll(){
     relances=relances.map(r=>({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]}));
     prevData=prevData.map(p=>({...p,types:p.types||[],typesData:p.types_data||{},assign:p.assigned_to,abn:p.assigned_to_name}));
     flotteData=flotteData.map(f=>({...f,assign:f.assigned_to,abn:f.assigned_to_name,historique:f.historique||[]}));
-    USERS=USERS.map(u=>({...u,pass:u.password,ini:u.initials}));
-    console.log('USERS chargés:', USERS.length, USERS[0]);
+    USERS=USERS.map(u=>({...u,pass:u.mdp,ini:u.initials}));
+    console.log('USERS chargés:', USERS.length, USERS[0]?.id, USERS[0]?.pass);
   }catch(e){console.error(e);}
   showLoader(false);
 }
