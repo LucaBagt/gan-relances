@@ -173,10 +173,19 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   <div class="header">
     <div class="hleft"><div class="hmark">G</div><div class="htitle">Pilotage Relances — GAN Fronton</div></div>
     <div class="hright">
-      <div class="uchip"><div class="udot"></div><span id="uname">—</span></div>
       <span class="abadge" id="abadge" style="display:none">Admin</span>
-      <button class="btn blogout" onclick="openChangeMdp()" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:white;padding:6px 13px;font-size:12px">🔑 Mot de passe</button>
-      <button class="btn blogout" onclick="doLogout()">Déconnexion</button>
+      <div style="position:relative">
+        <div class="uchip" onclick="toggleUserMenu()" style="cursor:pointer">
+          <div class="udot"></div>
+          <span id="uname">—</span>
+          <span style="font-size:10px;margin-left:2px">▼</span>
+        </div>
+        <div id="user-menu" style="display:none;position:absolute;right:0;top:42px;background:white;border-radius:var(--rs);box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:180px;z-index:2000;overflow:hidden">
+          <div style="padding:10px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)" id="user-menu-name"></div>
+          <button onclick="toggleUserMenu();openChangeMdp()" style="display:block;width:100%;padding:11px 14px;text-align:left;background:none;border:none;font-size:13px;color:var(--text);cursor:pointer;font-family:var(--fb)" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">🔑 Changer mon mot de passe</button>
+          <button onclick="doLogout()" style="display:block;width:100%;padding:11px 14px;text-align:left;background:none;border:none;font-size:13px;color:#C0392B;cursor:pointer;font-family:var(--fb)" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">↩ Déconnexion</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -470,7 +479,15 @@ async function changerMdp(){
   }
 }
 
-function syncVueTabs(){
+function toggleUserMenu(){
+  const m=document.getElementById('user-menu');
+  m.style.display=m.style.display==='none'?'block':'none';
+}
+// Fermer le menu si on clique ailleurs
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('user-menu');
+  if(menu&&!e.target.closest('.uchip')&&!e.target.closest('#user-menu'))menu.style.display='none';
+});
   document.getElementById('vtab-mes').classList.toggle('active',v===cu.id);
   document.getElementById('vtab-all').classList.toggle('active',v==='');
 }
@@ -492,6 +509,7 @@ async function doLogin(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('uname').textContent=u.name;
+  document.getElementById('user-menu-name').textContent=u.name+' — '+u.id;
   if(u.admin){document.getElementById('abadge').style.display='inline';document.getElementById('tadmin').style.display='inline-block';}
   buildFilters();buildPG();buildAssign();
   document.getElementById('fassign').value=cu.id;
