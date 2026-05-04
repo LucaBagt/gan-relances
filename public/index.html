@@ -834,8 +834,6 @@ async function suppRelance(id){
   toast('🗑️ Relance supprimée','info');
   renderTable();renderStats();
 }
-  renderTable();renderStats();
-}
 
 function openEmailD(id){
   const r=relances.find(x=>x.id===id);if(!r)return;
