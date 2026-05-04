@@ -148,6 +148,9 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 .pane{display:none}.pane.active{display:block}
 .empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
 .eok{color:var(--success);font-weight:500}.ew{color:var(--warning);font-weight:600}.el{color:var(--danger);font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:500;color:white;z-index:9999;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:320px}
+.toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -391,6 +394,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
       </div>
     </div>
     <div class="field"><label>Assigner à</label><select id="fl-assign"></select></div>
+    <div class="field"><label>Email client</label><input type="email" id="fl-email" placeholder="email@client.fr"></div>
     <div class="field"><label>Note</label><textarea id="fl-note" placeholder="Informations utiles sur le parc..."></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('mflotte')">Annuler</button>
@@ -805,8 +809,10 @@ async function ajouterRelance(){
     if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
     addLog('Relance créée','Client : '+client);
   }
+  const msg=editRelanceId?'✅ Relance modifiée !':'✅ Relance créée !';
   editRelanceId=null;
   cm('mrelance');renderTable();renderStats();
+  toast(msg);
 }
 
 async function marquerFait(id){
@@ -816,6 +822,7 @@ async function marquerFait(id){
     await sbPatch('relances',id,{statut:'fait',timeline:r.tl});
     r.stat='fait';
     addLog('Dossier traité','Client : '+r.client);
+    toast('✅ Dossier marqué traité !');
   }
   renderTable();renderStats();
 }
@@ -824,6 +831,9 @@ async function suppRelance(id){
   if(!confirm('Supprimer ?'))return;
   await sbDelete('relances',id);
   relances=relances.filter(r=>r.id!==id);
+  toast('🗑️ Relance supprimée','info');
+  renderTable();renderStats();
+}
   renderTable();renderStats();
 }
 
@@ -1063,7 +1073,7 @@ async function savePrev(){
     if(res&&res[0])prevData.unshift({...res[0],types,typesData,assign:aid,abn:au?.name||cu.name});
   }
   cm('mprev');renderPrevention();
-}
+  toast(editPrevId?'✅ Suivi modifié !':'✅ Suivi créé !');
 
 async function recevoirType(id, type){
   const x=prevData.find(p=>p.id===id);if(!x)return;
@@ -1190,6 +1200,7 @@ function openFlotte(id=null){
   document.getElementById('fl-ech').value=x?.ech||'';
   document.getElementById('fl-rappel').value=x?.rappel||'60';
   document.getElementById('fl-note').value=x?.note||'';
+  document.getElementById('fl-email').value=x?.email||'';
   const sel=document.getElementById('fl-assign');sel.innerHTML='';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((x?.assign||cu.id)===u.id)o.selected=true;sel.appendChild(o);});
   openModal('mflotte');
@@ -1201,14 +1212,17 @@ async function saveFlotte(){
   if(!client||!ref){alert('Client et N° contrat obligatoires');return;}
   const aid=document.getElementById('fl-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const data={client,ref,nb:parseInt(document.getElementById('fl-nb').value)||0,echeance:document.getElementById('fl-ech').value||null,rappel:parseInt(document.getElementById('fl-rappel').value)||60,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim()};
+  const email=document.getElementById('fl-email').value.trim();
+  const data={client,ref,nb:parseInt(document.getElementById('fl-nb').value)||0,echeance:document.getElementById('fl-ech').value||null,rappel:parseInt(document.getElementById('fl-rappel').value)||60,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim(),email};
   if(editFltId){
     const f=flotteData.find(x=>x.id===editFltId);
     Object.assign(f,{...data,assign:aid,abn:au?.name||cu.name,ech:data.echeance});
     await sbPatch('flotte',editFltId,data);
+    toast('✅ Contrat modifié !');
   }else{
     const res=await sbPost('flotte',{...data,historique:[]});
     if(res&&res[0])flotteData.unshift({...res[0],assign:aid,abn:au?.name||cu.name,ech:data.echeance,historique:[]});
+    toast('✅ Contrat créé !');
   }
   cm('mflotte');renderFlotte();
 }
@@ -1244,11 +1258,28 @@ function emailFlotte(id){
   const d=x.ech?dfmt(x.ech):'prochainement';
   const s=encodeURIComponent(`${x.client} — Point flotte automobile — Échéance ${d}`);
   const b=encodeURIComponent(`Bonjour,\n\nJe me permets de vous contacter dans le cadre du suivi de votre contrat flotte automobile (réf. ${x.ref}).\n\nVotre contrat arrive à échéance le ${d}. Afin de préparer au mieux le renouvellement, il est nécessaire de procéder à l'état de votre parc véhicules (entrées, sorties, modifications).\n\nPourriez-vous me communiquer l'état actuel de votre parc ou me proposer un créneau pour en faire le point ensemble ?\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
-  window.location.href=`mailto:?subject=${s}&body=${b}`;
+  window.location.href=`mailto:${x.email||''}?subject=${s}&body=${b}`;
 }
 
 // ===== LOGS =====
 let activityLogs=[];
+// ===== TOAST NOTIFICATIONS =====
+function toast(msg, type='success'){
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+// ===== RECHARGEMENT AUTO (toutes les 2 minutes) =====
+setInterval(async()=>{
+  if(!cu)return;
+  const before=relances.length;
+  await loadAll();
+  if(relances.length!==before){renderTable();renderStats();toast('🔄 Données mises à jour','info');}
+},120000);
+
 function addLog(action,detail,module='relances'){
   activityLogs.unshift({date:new Date().toISOString(),by:cu?.name||'?',action,detail,module});
   if(activityLogs.length>500)activityLogs=activityLogs.slice(0,500);
