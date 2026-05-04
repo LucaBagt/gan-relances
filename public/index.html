@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAN — Pilotage Relances</title>
+<title>GAN — Pilotage Relances V2</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F5F4F0;--surface:#FFF;--surface2:#EFEFEB;--border:#E0DED8;--text:#1A1A18;--muted:#7A7A72;--accent:#1E3A6E;--al:#E8EDF5;--danger:#C0392B;--dl:#FDECEA;--warning:#D68910;--wl:#FEF9E7;--success:#1E7B4B;--sl:#E8F5EE;--r:12px;--rs:8px;--fd:'Syne',sans-serif;--fb:'Instrument Sans',sans-serif;--sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);--shl:0 8px 32px rgba(0,0,0,.12)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* LOGIN */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--accent);position:relative;overflow:hidden}
 .login-screen::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,.04);top:-150px;right:-150px}
 .login-box{background:#fff;border-radius:20px;padding:44px 40px;width:370px;box-shadow:var(--shl);position:relative;z-index:1;animation:fadeUp .4s ease}
@@ -20,6 +22,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .ltitle{font-family:var(--fd);font-size:22px;font-weight:700;margin-bottom:4px}
 .lsub{font-size:13px;color:var(--muted);margin-bottom:24px}
 .lerr{background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:14px;display:none}
+
+/* FORMS */
 .field{margin-bottom:13px}
 .field label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
 .field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .15s}
@@ -27,6 +31,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .field textarea{min-height:75px;resize:vertical;line-height:1.6}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+
+/* BUTTONS */
 .btn{padding:10px 16px;border-radius:var(--rs);border:1.5px solid var(--border);background:#fff;color:var(--text);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
 .btn:hover{background:var(--surface2)}
 .bp{background:var(--accent);border-color:var(--accent);color:#fff}.bp:hover{background:#162d55}
@@ -34,27 +40,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .bs{background:var(--sl);border-color:#b8e0c8;color:var(--success)}
 .bfull{width:100%;justify-content:center}
 .bsm{padding:6px 11px;font-size:12px}
+
+/* APP */
 .app{display:none;flex-direction:column;min-height:100vh}.app.visible{display:flex}
 .header{background:var(--accent);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .hleft{display:flex;align-items:center;gap:12px}
 .hmark{width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px}
 .htitle{font-family:var(--fd);font-size:15px;font-weight:700}
 .hright{display:flex;align-items:center;gap:10px}
-.uchip{background:rgba(255,255,255,.15);padding:5px 11px;border-radius:20px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;cursor:pointer}
+.uchip{background:rgba(255,255,255,.15);padding:5px 11px;border-radius:20px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px}
 .udot{width:7px;height:7px;border-radius:50%;background:#4ade80}
 .abadge{background:rgba(255,200,0,.2);color:#FFD700;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase}
 .blogout{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;padding:6px 13px;font-size:12px}.blogout:hover{background:rgba(255,255,255,.2)}
+
+/* MAIN */
 .main{flex:1;padding:24px 28px;max-width:1440px;margin:0 auto;width:100%}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
 .sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
 .sn{font-family:var(--fd);font-size:26px;font-weight:800}
 .sl2{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
 .sr .sn{color:var(--danger)}.so .sn{color:var(--warning)}.sb .sn{color:var(--accent)}.sg .sn{color:var(--success)}
+
+/* TOOLBAR */
 .toolbar{display:flex;align-items:center;gap:9px;margin-bottom:16px;flex-wrap:wrap}
 .tleft{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap}
 .sinput{padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);font-size:13px;width:210px;outline:none;background:#fff}
 .sinput:focus{border-color:var(--accent)}
 .fsel{padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);font-size:13px;outline:none;background:#fff;cursor:pointer}
+
+/* TABLE */
 .tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 table{width:100%;border-collapse:collapse}
 thead th{padding:10px 13px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
@@ -63,30 +77,40 @@ tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--al)}
 tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 .cn{font-weight:600;font-size:14px}.cr{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* BADGES */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
-.bu{background:var(--dl);color:var(--danger)}.bn{background:var(--al);color:var(--accent)}.ba{background:var(--wl);color:var(--warning)}.bf{background:var(--surface2);color:var(--muted)}.be{background:var(--dl);color:var(--danger);border:1px solid #f5c6c2}
+.bu{background:var(--dl);color:var(--danger)}.bn{background:var(--al);color:var(--accent)}.ba{background:var(--wl);color:var(--warning)}.bf{background:var(--surface2);color:var(--muted)}.be{background:var(--dl);color:var(--danger);border:1px solid #f5c6c2}.brel{background:#FDF3FF;color:#7B2D8B}
 .ptag{display:inline-block;padding:3px 7px;background:var(--surface2);border-radius:4px;font-size:11px;font-weight:500;color:var(--text);margin:1px}
 .av{width:26px;height:26px;border-radius:50%;background:var(--al);color:var(--accent);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-family:var(--fd)}
 .avg{background:#F0FFF4;color:var(--success)}
 .acts{display:flex;gap:5px;flex-wrap:wrap}
-.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+
+/* MODAL */
+.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
 .overlay.open{display:flex}
 .modal{background:#fff;border-radius:16px;padding:30px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl);animation:fadeUp .25s ease}
 .modal.wide{max-width:700px}
 .mtitle{font-family:var(--fd);font-size:19px;font-weight:700;margin-bottom:3px}
 .msub{font-size:13px;color:var(--muted);margin-bottom:20px}
 .macts{display:flex;gap:9px;justify-content:flex-end;margin-top:22px}
+
+/* PIECES GRID */
 .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:230px;overflow-y:auto;padding:2px}
 .pcb{display:flex;align-items:center;gap:7px;padding:8px 11px;border:1.5px solid var(--border);border-radius:var(--rs);cursor:pointer;font-size:13px;transition:all .15s}
 .pcb:hover{border-color:var(--accent);background:var(--al)}
 .pcb input{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0}
 .pcb.checked{border-color:var(--accent);background:var(--al)}
+
+/* DETAIL */
 .dh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
 .dc{font-family:var(--fd);font-size:20px;font-weight:800}
 .dmeta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
 .dmi{background:var(--surface2);border-radius:var(--rs);padding:11px 13px}
 .dmil{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
 .dmiv{font-size:13px;font-weight:600}
+
+/* TIMELINE */
 .tl-item{display:flex;gap:12px;margin-bottom:14px;position:relative}
 .tl-item::before{content:'';position:absolute;left:15px;top:34px;bottom:-14px;width:1px;background:var(--border)}
 .tl-item:last-child::before{display:none}
@@ -101,6 +125,8 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 .note-row{display:flex;gap:8px;margin-top:14px}
 .note-row textarea{flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);font-size:13px;resize:none;height:56px;outline:none}
 .note-row textarea:focus{border-color:var(--accent)}
+
+/* ADMIN */
 .asec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:18px;box-shadow:var(--sh)}
 .atitle{font-family:var(--fd);font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:7px}
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:11px}
@@ -114,18 +140,19 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 .parow{display:flex;gap:9px}
 .parow input{flex:1;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);font-size:13px;outline:none}
 .parow input:focus{border-color:var(--accent)}
+
+/* TABS */
 .ptabs{display:flex;gap:3px;margin-bottom:22px;background:var(--surface2);padding:4px;border-radius:var(--rs);width:fit-content}
 .ptab{padding:7px 16px;border:none;background:transparent;font-family:var(--fb);font-size:13px;font-weight:500;color:var(--muted);border-radius:6px;cursor:pointer;transition:all .15s}
 .ptab.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .pane{display:none}.pane.active{display:block}
 .empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
 .eok{color:var(--success);font-weight:500}.ew{color:var(--warning);font-weight:600}.el{color:var(--danger);font-weight:600}
-.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:500;color:white;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:320px}
-.toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--accent)}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="llogo">
@@ -141,12 +168,13 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
+<!-- APP -->
 <div class="app" id="app">
   <div class="header">
     <div class="hleft"><div class="hmark">G</div><div class="htitle">Pilotage Relances — GAN Fronton</div></div>
     <div class="hright">
       <span class="abadge" id="abadge" style="display:none">Admin</span>
-      <div class="uchip" onclick="showPage('mdp')">
+      <div class="uchip" onclick="showPage('mdp')" style="cursor:pointer">
         <div class="udot"></div>
         <span id="uname">—</span>
         <span style="font-size:10px;margin-left:4px">🔑</span>
@@ -154,17 +182,25 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
       <button class="btn blogout" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
+
   <div class="main">
     <div class="ptabs">
-      <button class="ptab active" onclick="showPage('relances')">📋 Relances</button>
+      <button class="ptab active" onclick="showPage('dashboard')">🏠 Dashboard</button>
+      <button class="ptab" onclick="showPage('relances')">📋 Relances</button>
       <button class="ptab" onclick="showPage('prevention')">🔥 Prévention</button>
       <button class="ptab" onclick="showPage('flotte')">🚗 Flottes</button>
+      <button class="ptab" onclick="showPage('archives')">📁 Archives</button>
+      <button class="ptab" onclick="showPage('stats')">📊 Statistiques</button>
+      <button class="ptab" onclick="showPage('logs')">📜 Activité</button>
       <button class="ptab" onclick="showPage('admin')" id="tadmin" style="display:none">⚙️ Administration</button>
     </div>
-    <div id="pane-relances" class="pane active">
+
+    <div id="pane-dashboard" class="pane active"><div id="dashboard-content"></div></div>
+    <div id="pane-relances" class="pane">
       <div class="stats" id="stats"></div>
       <div class="toolbar">
         <div class="tleft">
+          <!-- ONGLETS VUE RAPIDE -->
           <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
             <button id="vtab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setVue('mes')">👤 Mes relances</button>
             <button id="vtab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setVue('all')">🌐 Toutes</button>
@@ -188,17 +224,24 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
           </select>
         </div>
         <button class="btn bp" onclick="openModalRelance()">+ Nouvelle relance</button>
-        <button class="btn" onclick="exportExcel()">📥 Export</button>
+        <button class="btn" onclick="exportExcel()" title="Exporter en Excel">📥 Export</button>
       </div>
       <div class="tw">
         <table>
-          <thead><tr><th>Client</th><th>Pièces manquantes</th><th>Priorité</th><th>Échéance</th><th>Créé par</th><th>Assigné à</th><th>Statut</th><th>Relances</th><th>Actions</th></tr></thead>
+          <thead><tr>
+            <th>Client</th><th>Pièces manquantes</th><th>Priorité</th><th>Échéance</th>
+            <th>Créé par</th><th>Assigné à</th><th>Statut</th><th>Relances</th><th>Actions</th>
+          </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
         <div class="empty" id="tempty" style="display:none">Aucune relance trouvée</div>
       </div>
     </div>
+
     <div id="pane-admin" class="pane"><div id="admin-content"></div></div>
+    <div id="pane-archives" class="pane"><div id="archives-content"></div></div>
+    <div id="pane-stats" class="pane"><div id="stats-content"></div></div>
+    <div id="pane-logs" class="pane"><div id="logs-content"></div></div>
     <div id="pane-prevention" class="pane"><div id="prev-content"></div></div>
     <div id="pane-flotte" class="pane"><div id="flotte-content"></div></div>
     <div id="pane-mdp" class="pane">
@@ -208,36 +251,40 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
           <div class="field"><label>Identifiant</label><input type="text" id="mdp-id" disabled style="background:var(--surface2);color:var(--muted)"></div>
           <div class="field"><label>Mot de passe actuel</label><input type="password" id="mdp-old" placeholder="••••••••"></div>
           <div class="field"><label>Nouveau mot de passe</label><input type="password" id="mdp-new" placeholder="••••••••"></div>
-          <div class="field"><label>Confirmer</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
+          <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
           <div id="mdp-error" style="background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none"></div>
-          <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié !</div>
-          <button class="btn bp" onclick="changerMdp()" style="width:100%;justify-content:center">Enregistrer</button>
+          <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié avec succès !</div>
+          <button class="btn bp" onclick="changerMdp()" style="width:100%;justify-content:center">Enregistrer le nouveau mot de passe</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL NOUVELLE RELANCE -->
+<!-- MODAL NOUVELLE/MODIFIER RELANCE -->
 <div class="overlay" id="mrelance">
   <div class="modal">
     <div class="mtitle" id="mrelance-title">Nouvelle relance</div>
-    <div class="msub">Renseignez les informations du dossier</div>
+    <div class="msub" id="mrelance-sub">Renseignez les informations du dossier</div>
     <div class="r2">
-      <div class="field"><label>Client *</label><input type="text" id="rc" placeholder="Nom du client"></div>
-      <div class="field"><label>N° Contrat</label><input type="text" id="rref" placeholder="Référence"></div>
+      <div class="field"><label>Client / Société *</label><input type="text" id="rc" placeholder="Nom du client"></div>
+      <div class="field"><label>N° Contrat / Dossier</label><input type="text" id="rref" placeholder="Référence"></div>
     </div>
     <div class="field"><label>Email client</label><input type="email" id="remail" placeholder="email@client.fr"></div>
     <div class="r3">
-      <div class="field"><label>Priorité</label><select id="rprio"><option value="urgent">🔴 Urgent</option><option value="normal" selected>🔵 Normal</option><option value="attente">🟡 En attente</option></select></div>
-      <div class="field"><label>Délai (jours)</label><select id="rdelai"><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select></div>
+      <div class="field"><label>Priorité</label>
+        <select id="rprio"><option value="urgent">🔴 Urgent</option><option value="normal" selected>🔵 Normal</option><option value="attente">🟡 En attente</option></select>
+      </div>
+      <div class="field"><label>Échéance</label>
+        <input type="date" id="rech">
+      </div>
       <div class="field"><label>Assigner à</label><select id="rassign"></select></div>
     </div>
     <div class="field"><label>Pièces manquantes *</label><div class="pgrid" id="pgrid"></div></div>
-    <div class="field"><label>Note</label><textarea id="rnote" placeholder="Informations complémentaires..."></textarea></div>
+    <div class="field"><label>Note interne</label><textarea id="rnote" placeholder="Informations complémentaires..."></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('mrelance')">Annuler</button>
-      <button class="btn bp" id="mrelance-btn" onclick="ajouterRelance()">Créer →</button>
+      <button class="btn bp" id="mrelance-btn" onclick="ajouterRelance()">Créer la relance →</button>
     </div>
   </div>
 </div>
@@ -249,8 +296,8 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div class="macts">
       <button class="btn" onclick="cm('mdetail')">Fermer</button>
       <button class="btn" onclick="cm('mdetail');openModalRelance(cdid)">✏️ Modifier</button>
-      <button class="btn bs" onclick="faitDetail()">✓ Traité</button>
-      <button class="btn bp" onclick="emailDetail()">✉ Email</button>
+      <button class="btn bs" onclick="faitDetail()">✓ Marquer traité</button>
+      <button class="btn bp" onclick="emailDetail()">✉ Relancer par email</button>
     </div>
   </div>
 </div>
@@ -260,18 +307,18 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   <div class="modal">
     <div class="mtitle">Email de relance</div>
     <div class="msub" id="emailsub"></div>
-    <div class="field"><label>Expéditeur</label>
+    <div class="field"><label>Expéditeur (compte Outlook)</label>
       <select id="efrom">
-        <option value="Luca.Bagatella@gan.fr">📧 Luca.Bagatella@gan.fr</option>
-        <option value="fronton@gan.fr">🏢 fronton@gan.fr</option>
+        <option value="Luca.Bagatella@gan.fr">📧 Luca.Bagatella@gan.fr (compte personnel GAN)</option>
+        <option value="fronton@gan.fr">🏢 fronton@gan.fr (boîte agence)</option>
       </select>
     </div>
     <div class="field"><label>Destinataire</label><input type="email" id="eto" placeholder="email@client.fr"></div>
     <div class="field"><label>Objet</label><input type="text" id="esubj"></div>
-    <div class="field"><label>Message</label><textarea id="ebody" style="min-height:210px"></textarea></div>
+    <div class="field"><label>Corps du message</label><textarea id="ebody" style="min-height:210px"></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('memail')">Annuler</button>
-      <button class="btn bp" onclick="envoyerEmail()">📧 Ouvrir Outlook</button>
+      <button class="btn bp" onclick="envoyerEmail()">📧 Ouvrir dans Outlook</button>
     </div>
   </div>
 </div>
@@ -280,26 +327,45 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 <div class="overlay" id="mprev">
   <div class="modal">
     <div class="mtitle" id="mprev-title">Nouveau suivi prévention</div>
-    <div class="msub">Renseignez les informations</div>
+    <div class="msub">Renseignez les informations du document à suivre</div>
     <div class="r2">
-      <div class="field"><label>Client *</label><input type="text" id="pv-client" placeholder="Nom du client"></div>
+      <div class="field"><label>Client / Société *</label><input type="text" id="pv-client" placeholder="Nom du client"></div>
       <div class="field"><label>N° Contrat</label><input type="text" id="pv-ref" placeholder="Référence"></div>
     </div>
-    <div class="field"><label>Email client</label><input type="email" id="pv-email" placeholder="email@client.fr"></div>
-    <div class="field"><label>Types de vérification *</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
-        <label class="pcb"><input type="checkbox" value="Extincteurs mobiles" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 🧯 Extincteurs</label>
-        <label class="pcb"><input type="checkbox" value="Vérification électrique" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> ⚡ Électrique</label>
-        <label class="pcb"><input type="checkbox" value="Thermographie" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 🌡️ Thermographie</label>
-        <label class="pcb"><input type="checkbox" value="Rapport sécurité incendie" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 🔥 Incendie</label>
-        <label class="pcb"><input type="checkbox" value="Exutoire de fumées" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 💨 Exutoire</label>
+    <div class="r2">
+      <div class="field"><label>Types de vérification * (plusieurs possibles)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+          <label class="pcb" id="pvt-ext"><input type="checkbox" value="Extincteurs mobiles" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 🧯 Extincteurs mobiles</label>
+          <label class="pcb" id="pvt-elec"><input type="checkbox" value="Vérification électrique" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> ⚡ Vérification électrique</label>
+          <label class="pcb" id="pvt-thermo"><input type="checkbox" value="Thermographie" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 🌡️ Thermographie</label>
+          <label class="pcb" id="pvt-incendie"><input type="checkbox" value="Rapport sécurité incendie" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 🔥 Sécurité incendie</label>
+          <label class="pcb" id="pvt-exutoire"><input type="checkbox" value="Exutoire de fumées" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)"> 💨 Exutoire de fumées</label>
+        </div>
+      </div>
+      <div class="field"><label>Assigner à</label><select id="pv-assign"></select></div>
+      <div class="field"><label>Email client</label><input type="email" id="pv-email" placeholder="email@client.fr"></div>
+      <div class="field"><label>Note</label><textarea id="pv-note" placeholder="Observations..."></textarea></div>
+      <div class="macts">
+        <button class="btn" onclick="cm('mprev')">Annuler</button>
+        <button class="btn bp" onclick="savePrev()">Enregistrer →</button>
       </div>
     </div>
-    <div class="field"><label>Assigner à</label><select id="pv-assign"></select></div>
-    <div class="field"><label>Note</label><textarea id="pv-note" placeholder="Observations..."></textarea></div>
+  </div>
+</div>
+
+<!-- MODAL CHANGEMENT MOT DE PASSE -->
+<div class="overlay" id="mmdp">
+  <div class="modal" style="max-width:420px">
+    <div class="mtitle">🔑 Changer mon mot de passe</div>
+    <div class="msub" id="mmdp-user"></div>
+    <div class="field"><label>Mot de passe actuel</label><input type="password" id="mdp-old" placeholder="••••••••"></div>
+    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="mdp-new" placeholder="••••••••"></div>
+    <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="mdp-confirm" placeholder="••••••••"></div>
+    <div id="mdp-error" style="background:var(--dl);color:var(--danger);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none"></div>
+    <div id="mdp-success" style="background:var(--sl);color:var(--success);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px;display:none">✅ Mot de passe modifié avec succès !</div>
     <div class="macts">
-      <button class="btn" onclick="cm('mprev')">Annuler</button>
-      <button class="btn bp" onclick="savePrev()">Enregistrer →</button>
+      <button class="btn" onclick="cm('mmdp')">Fermer</button>
+      <button class="btn bp" onclick="changerMdp()">Enregistrer →</button>
     </div>
   </div>
 </div>
@@ -308,25 +374,24 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 <div class="overlay" id="mflotte">
   <div class="modal">
     <div class="mtitle" id="mflotte-title">Nouveau contrat flotte</div>
-    <div class="msub">Renseignez les informations</div>
+    <div class="msub">Renseignez les informations du contrat</div>
     <div class="r2">
-      <div class="field"><label>Client *</label><input type="text" id="fl-client" placeholder="Nom du client"></div>
-      <div class="field"><label>N° Contrat *</label><input type="text" id="fl-ref" placeholder="Référence"></div>
+      <div class="field"><label>Client / Société *</label><input type="text" id="fl-client" placeholder="Nom du client"></div>
+      <div class="field"><label>N° Contrat *</label><input type="text" id="fl-ref" placeholder="Référence contrat"></div>
     </div>
-    <div class="field"><label>Email client</label><input type="email" id="fl-email" placeholder="email@client.fr"></div>
     <div class="r3">
-      <div class="field"><label>Véhicules</label><input type="number" id="fl-nb" placeholder="Ex: 5" min="1"></div>
-      <div class="field"><label>Date échéance</label><input type="date" id="fl-ech"></div>
-      <div class="field"><label>Rappel</label>
+      <div class="field"><label>Nombre de véhicules</label><input type="number" id="fl-nb" placeholder="Ex: 5" min="1"></div>
+      <div class="field"><label>Date d'échéance annuelle</label><input type="date" id="fl-ech"></div>
+      <div class="field"><label>Rappel avant échéance</label>
         <select id="fl-rappel">
-          <option value="30">30 jours</option>
-          <option value="60" selected>60 jours</option>
-          <option value="90">90 jours</option>
+          <option value="30">30 jours avant</option>
+          <option value="60" selected>60 jours avant</option>
+          <option value="90">90 jours avant</option>
         </select>
       </div>
     </div>
     <div class="field"><label>Assigner à</label><select id="fl-assign"></select></div>
-    <div class="field"><label>Note</label><textarea id="fl-note" placeholder="Informations sur le parc..."></textarea></div>
+    <div class="field"><label>Note</label><textarea id="fl-note" placeholder="Informations utiles sur le parc..."></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('mflotte')">Annuler</button>
       <button class="btn bp" onclick="saveFlotte()">Enregistrer →</button>
@@ -334,39 +399,61 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
+
+
+
 <script>
+
+let cu=null,cdid=null,ceid=null;
+
+const ETPLS={
+  'Permis de conduire':'je me permets de vous relancer concernant la transmission de votre permis de conduire (recto-verso) nécessaire à la finalisation de votre dossier.',
+  'Carte d\'identité':'je me permets de vous relancer concernant la copie de votre pièce d\'identité (recto-verso) indispensable pour la mise en place de votre contrat.',
+  'RIB / IBAN':'je me permets de vous relancer concernant votre relevé d\'identité bancaire (RIB/IBAN) nécessaire au prélèvement de vos cotisations.',
+  'Kbis':'je me permets de vous relancer concernant l\'extrait Kbis de votre société, document obligatoire pour l\'établissement de votre contrat professionnel.',
+  'Devis signé':'je me permets de vous relancer concernant la signature et le retour du devis que je vous ai adressé.',
+  'Lettre de devoir de conseil':'je me permets de vous relancer concernant la signature et le retour de la lettre de devoir de conseil jointe à votre dossier.',
+  'Carte grise':'je me permets de vous relancer concernant la copie de la carte grise du véhicule assuré.',
+  'Relevé d\'information':'je me permets de vous relancer concernant votre relevé d\'information auprès de votre précédent assureur.',
+  'PV de restitution':'je me permets de vous relancer concernant le procès-verbal de restitution nécessaire au retrait du véhicule de votre flotte.',
+  'Bilan comptable':'je me permets de vous relancer concernant votre bilan comptable nécessaire à la régularisation de votre contrat.',
+};
+
+function emailBody(pieces,delai){
+  const fp=pieces&&pieces[0];
+  const t=ETPLS[fp]||`je me permets de vous relancer concernant les documents suivants : ${(pieces||[]).join(', ')}.`;
+  const list=pieces&&pieces.length>1?'\n\nDocuments attendus :\n'+pieces.map(p=>'  — '+p).join('\n'):'';
+  return `Bonjour,\n\n${t}${list}\n\nSans retour de votre part sous ${delai||7} jours, nous pourrions être dans l'impossibilité de traiter votre dossier dans les meilleurs délais.\n\nRestant à votre disposition pour tout renseignement complémentaire.\n\nBien cordialement,\n\n${cu?.name||'Luca BAGATELLA'}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`;
+}
+function dn(d=0){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0];}
+function dfmt(d){return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
+
+// ===== SUPABASE =====
 const SB='https://eqrltvqfuiznemhzjbez.supabase.co/rest/v1';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxcmx0dnFmdWl6bmVtaHpqYmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MTM5MTgsImV4cCI6MjA5MzM4OTkxOH0.nmP8C7QvKIEvDhC5y0w9POKmdvJ1-NEMkqkcY8EH4UM';
 const SB_HEADERS={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
-async function sbGet(t,p=''){const r=await fetch(SB+'/'+t+p,{headers:SB_HEADERS});return r.json();}
-async function sbPost(t,d){const r=await fetch(SB+'/'+t,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify(d)});return r.json();}
-async function sbPatch(t,id,d){const r=await fetch(SB+'/'+t+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify(d)});return r.json();}
-async function sbDelete(t,id){await fetch(SB+'/'+t+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});}
-
-let cu=null,cdid=null,ceid=null,editRelanceId=null,editPrevId=null,editFltId=null;
-let USERS=[],PIECES=[],relances=[],prevData=[],flotteData=[];
-
-function dn(d=0){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0];}
-function dfmt(d){if(!d)return'—';return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
-function isEch(r){return r.ech&&new Date(r.ech)<new Date()&&r.stat!=='fait';}
-
-const MODAL_STYLE='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
-function openModal(id){document.getElementById(id).style.cssText=MODAL_STYLE;}
-function cm(id){document.getElementById(id).style.cssText='';document.getElementById(id).classList.remove('open');}
-
-function toast(msg,type='success'){
-  const t=document.createElement('div');
-  t.className='toast toast-'+type;
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),3500);
+async function sbGet(table,params=''){
+  const r=await fetch(`${SB}/${table}${params}`,{headers:SB_HEADERS});
+  return r.json();
+}
+async function sbPost(table,data){
+  const r=await fetch(`${SB}/${table}`,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify(data)});
+  return r.json();
+}
+async function sbPatch(table,id,data){
+  const r=await fetch(`${SB}/${table}?id=eq.${id}`,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify(data)});
+  return r.json();
+}
+async function sbDelete(table,id){
+  await fetch(`${SB}/${table}?id=eq.${id}`,{method:'DELETE',headers:SB_HEADERS});
 }
 
-function showLoader(v){
-  let el=document.getElementById('loader');
-  if(!el){el=document.createElement('div');el.id='loader';el.style.cssText='position:fixed;inset:0;background:rgba(30,58,110,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-family:var(--fb)';el.innerHTML='<div style="text-align:center"><div style="font-size:32px;margin-bottom:12px">⏳</div>Chargement...</div>';document.body.appendChild(el);}
-  el.style.display=v?'flex':'none';
-}
+let USERS=[];
+let PIECES=[];
+let relances=[];
+let prevData=[];
+let flotteData=[];
+let nid=1,prevNid=1,flotteNid=1;
 
 async function loadAll(){
   showLoader(true);
@@ -379,6 +466,7 @@ async function loadAll(){
       sbGet('flotte','?order=created_at.desc'),
     ]);
     PIECES=PIECES.map(p=>p.nom);
+    // Normaliser les données
     relances=relances.map(r=>({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]}));
     prevData=prevData.map(p=>({...p,types:p.types||[],typesData:p.types_data||{},assign:p.assigned_to,abn:p.assigned_to_name}));
     flotteData=flotteData.map(f=>({...f,assign:f.assigned_to,abn:f.assigned_to_name,historique:f.historique||[]}));
@@ -387,17 +475,109 @@ async function loadAll(){
   showLoader(false);
 }
 
+function showLoader(v){
+  let el=document.getElementById('loader');
+  if(!el){el=document.createElement('div');el.id='loader';el.style.cssText='position:fixed;inset:0;background:rgba(30,58,110,0.7);z-index:999;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-family:var(--fb)';el.innerHTML='<div style="text-align:center"><div style="font-size:32px;margin-bottom:12px">⏳</div>Chargement...</div>';document.body.appendChild(el);}
+  el.style.display=v?'flex':'none';
+}
+
+function openChangeMdp(){
+  if(!cu){return;}
+  // Fermer le menu
+  // Attendre que le menu soit fermé puis ouvrir la modal
+  setTimeout(()=>{
+    document.getElementById('mdp-old').value='';
+    document.getElementById('mdp-new').value='';
+    document.getElementById('mdp-confirm').value='';
+    document.getElementById('mdp-error').style.display='none';
+    document.getElementById('mdp-success').style.display='none';
+    document.getElementById('mmdp-user').textContent='Connecté en tant que '+cu.name;
+    const m=document.getElementById('mmdp');
+    m.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+  },100);
+}
+
+async function changerMdp(){
+  const old=document.getElementById('mdp-old').value;
+  const nv=document.getElementById('mdp-new').value;
+  const conf=document.getElementById('mdp-confirm').value;
+  const err=document.getElementById('mdp-error');
+  const ok=document.getElementById('mdp-success');
+  err.style.display='none';ok.style.display='none';
+
+  if(old!==cu.pass){err.textContent='Mot de passe actuel incorrect';err.style.display='block';return;}
+  if(nv.length<6){err.textContent='Le nouveau mot de passe doit contenir au moins 6 caractères';err.style.display='block';return;}
+  if(nv!==conf){err.textContent='Les deux mots de passe ne correspondent pas';err.style.display='block';return;}
+
+  try{
+    await fetch(`${SB}/users?id=eq.${cu.id}`,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify({mdp:nv,password:nv})});
+    cu.pass=nv;
+    ok.style.display='block';
+    document.getElementById('mdp-old').value='';
+    document.getElementById('mdp-new').value='';
+    document.getElementById('mdp-confirm').value='';
+    setTimeout(()=>cm('mmdp'),2000);
+  }catch(e){
+    err.textContent='Erreur lors de la mise à jour. Réessayez.';
+    err.style.display='block';
+  }
+}
+
+
+// ===== FILTRES MES/TOUS PREVENTION & FLOTTE =====
+function setPrevVue(v){
+  document.getElementById('pvtab-mes')?.classList.toggle('active',v==='mes');
+  document.getElementById('pvtab-all')?.classList.toggle('active',v==='all');
+  const sel=document.getElementById('prev-fassign');
+  if(sel)sel.value=v==='mes'?cu.id:'';
+  renderPrevention();
+}
+function setFltVue(v){
+  document.getElementById('flttab-mes')?.classList.toggle('active',v==='mes');
+  document.getElementById('flttab-all')?.classList.toggle('active',v==='all');
+  const sel=document.getElementById('flt-assign');
+  if(sel)sel.value=v==='mes'?cu.id:'';
+  renderFlotte();
+}
+
+// ===== EXPORT EXCEL =====
+function exportExcel(){
+  const rows=[['Client','Référence','Pièces','Priorité','Échéance','Créé par','Assigné à','Statut','Nb relances']];
+  relances.forEach(r=>{
+    rows.push([r.client,r.ref||'',r.pieces.join(', '),r.prio,r.ech||'',r.cbn,r.abn,r.stat,r.tl.filter(t=>t.type==='email').length]);
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='relances_gan_'+dn(0)+'.csv';
+  a.click();
+}
+
+function syncVueTabs(){
+  const v=document.getElementById('fassign').value;
+  document.getElementById('vtab-mes').classList.toggle('active',v===cu.id);
+  document.getElementById('vtab-all').classList.toggle('active',v==='');
+}
+
+function setVue(v){
+  document.getElementById('vtab-mes').classList.toggle('active',v==='mes');
+  document.getElementById('vtab-all').classList.toggle('active',v==='all');
+  document.getElementById('fassign').value = v==='mes' ? cu.id : '';
+  renderTable();
+}
+
 async function doLogin(){
   const id=document.getElementById('lu').value.trim().toUpperCase();
   const pass=document.getElementById('lp').value;
   if(!USERS.length)await loadAll();
-  const u=USERS.find(x=>x.id===id&&x.pass===pass);
+  const u=USERS.find(x=>x.id===id&&(x.pass===pass||x.mdp===pass||x.password===pass));
   if(!u){document.getElementById('lerr').style.display='block';return;}
-  localStorage.setItem('gan_session',JSON.stringify({id:u.id,pass:u.pass}));
-  connectUser(u);
+  localStorage.setItem('gan_session',JSON.stringify({id:u.id,pass:u.pass||u.mdp||u.password}));
+  await connectUser(u);
 }
 
-function connectUser(u){
+async function connectUser(u){
   cu=u;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
@@ -405,9 +585,11 @@ function connectUser(u){
   if(u.admin){document.getElementById('abadge').style.display='inline';document.getElementById('tadmin').style.display='inline-block';}
   buildFilters();buildPG();buildAssign();
   document.getElementById('fassign').value=cu.id;
-  showPage('relances');renderStats();checkEch();
+  addLog('Connexion','Connexion à l\'application','système');
+  showPage('dashboard');renderStats();checkEch();
 }
 
+// Restaurer la session au chargement
 async function restoreSession(){
   try{
     const sess=localStorage.getItem('gan_session');
@@ -415,7 +597,7 @@ async function restoreSession(){
     const {id,pass}=JSON.parse(sess);
     if(!USERS.length)await loadAll();
     const u=USERS.find(x=>x.id===id&&x.pass===pass);
-    if(u)connectUser(u);
+    if(u)await connectUser(u);
   }catch(e){localStorage.removeItem('gan_session');}
 }
 
@@ -430,59 +612,32 @@ function doLogout(){
   document.getElementById('tadmin').style.display='none';
 }
 
-function showPage(n){
-  const pages=['relances','prevention','flotte','admin','mdp'];
-  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',pages[i]===n));
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pane-'+n).classList.add('active');
-  if(n==='admin')renderAdmin();
-  if(n==='prevention')renderPrevention();
-  if(n==='flotte')renderFlotte();
-  if(n==='mdp'){
-    document.getElementById('mdp-id').value=cu?.id||'';
-    ['mdp-old','mdp-new','mdp-confirm'].forEach(id=>document.getElementById(id).value='');
-    ['mdp-error','mdp-success'].forEach(id=>document.getElementById(id).style.display='none');
-  }
-}
-
-function syncVueTabs(){
-  const v=document.getElementById('fassign').value;
-  document.getElementById('vtab-mes').classList.toggle('active',v===cu.id);
-  document.getElementById('vtab-all').classList.toggle('active',v==='');
-}
-
-function setVue(v){
-  document.getElementById('vtab-mes').classList.toggle('active',v==='mes');
-  document.getElementById('vtab-all').classList.toggle('active',v==='all');
-  document.getElementById('fassign').value=v==='mes'?cu.id:'';
-  renderTable();
-}
 
 function buildFilters(){
   const s=document.getElementById('fassign');
   s.innerHTML='<option value="">Tous collaborateurs</option>';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;s.appendChild(o);});
 }
-function buildAssign(def=null){
+function buildAssign(defaultId=null){
   const s=document.getElementById('rassign');s.innerHTML='';
-  USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((def||cu.id)===u.id)o.selected=true;s.appendChild(o);});
+  USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((defaultId||cu.id)===u.id)o.selected=true;s.appendChild(o);});
 }
 function buildPG(){
   document.getElementById('pgrid').innerHTML=PIECES.map(p=>`<label class="pcb"><input type="checkbox" value="${p}" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)">${p}</label>`).join('');
 }
 
+function isEch(r){return r.ech&&new Date(r.ech)<new Date()&&r.stat!=='fait';}
 function echLabel(r){
-  if(!r.ech)return'—';
+  if(!r.ech)return '—';
   const d=Math.ceil((new Date(r.ech)-new Date())/86400000);
   const ds=dfmt(r.ech);
-  if(d<0)return`<span class="el">⚠ Échu (${Math.abs(d)}j)</span>`;
-  if(d===0)return`<span class="ew">⚡ Aujourd'hui</span>`;
-  if(d<=3)return`<span class="ew">⏰ ${ds} (${d}j)</span>`;
-  return`<span class="eok">📅 ${ds}</span>`;
+  if(d<0)return `<span class="el">⚠ Échu (${Math.abs(d)}j)</span>`;
+  if(d===0)return `<span class="ew">⚡ Aujourd'hui</span>`;
+  if(d<=3)return `<span class="ew">⏰ ${ds} (${d}j)</span>`;
+  return `<span class="eok">📅 ${ds}</span>`;
 }
 
 function renderStats(){
-  if(!cu)return;
   const op=relances.filter(r=>r.stat!=='fait');
   document.getElementById('stats').innerHTML=`
     <div class="sc sb"><div class="sn">${op.length}</div><div class="sl2">En cours</div></div>
@@ -493,7 +648,6 @@ function renderStats(){
 }
 
 function renderTable(){
-  if(!cu)return;
   const s=document.getElementById('search').value.toLowerCase();
   const fs=document.getElementById('fstat').value;
   const fa=document.getElementById('fassign').value;
@@ -515,24 +669,27 @@ function renderTable(){
   const em=document.getElementById('tempty');
   if(!list.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  tb.innerHTML=list.map(r=>`<tr onclick="openDetail(${r.id})">
-    <td><div class="cn">${r.client}</div><div class="cr">${r.ref||'—'}</div></td>
-    <td>${r.pieces.map(p=>`<span class="ptag">${p}</span>`).join('')}</td>
-    <td><span class="badge b${r.prio[0]}">${r.prio}</span></td>
-    <td>${echLabel(r)}</td>
-    <td><div class="av">${USERS.find(u=>u.id===r.cb)?.ini||'?'}</div></td>
-    <td><div style="display:flex;align-items:center;gap:5px"><div class="av avg">${USERS.find(u=>u.id===r.ab)?.ini||'?'}</div><span style="font-size:12px">${r.abn}</span></div></td>
-    <td><span class="badge b${isEch(r)?'e':r.stat[0]}">${isEch(r)?'Échu':r.stat}</span></td>
-    <td style="text-align:center;font-weight:600;color:var(--accent)">${r.tl.filter(t=>t.type==='email').length}</td>
-    <td onclick="event.stopPropagation()">
-      <div class="acts">
-        <button class="btn bsm" onclick="openEmailD(${r.id})">✉</button>
-        <button class="btn bsm" onclick="openModalRelance(${r.id})">✏️</button>
-        <button class="btn bsm bs" onclick="marquerFait(${r.id})">✓</button>
-        <button class="btn bsm bd" onclick="suppRelance(${r.id})">✕</button>
-      </div>
-    </td>
-  </tr>`).join('');
+  const ce=r=>true; // Tout utilisateur peut traiter ou supprimer une tâche
+  tb.innerHTML=list.map(r=>{
+    const emails=r.tl.filter(t=>t.type==='email').length;
+    return `<tr onclick="openDetail(${r.id})">
+      <td><div class="cn">${r.client}</div><div class="cr">${r.ref||'—'}</div>${r.note?`<div class="cr" style="font-style:italic">${r.note}</div>`:''}</td>
+      <td>${r.pieces.map(p=>`<span class="ptag">${p}</span>`).join('')}</td>
+      <td><span class="badge b${r.prio[0]}">${r.prio}</span></td>
+      <td>${echLabel(r)}</td>
+      <td><div style="display:flex;align-items:center;gap:5px"><div class="av">${USERS.find(u=>u.id===r.cb)?.ini||'?'}</div><span style="font-size:12px">${r.cbn}</span></div></td>
+      <td><div style="display:flex;align-items:center;gap:5px"><div class="av avg">${USERS.find(u=>u.id===r.ab)?.ini||'?'}</div><span style="font-size:12px">${r.abn}</span></div></td>
+      <td><span class="badge b${isEch(r)?'e':r.stat[0]}">${isEch(r)?'Échu':r.stat}</span></td>
+      <td style="text-align:center;font-weight:600;color:${emails>0?'var(--accent)':'var(--muted)'}">${emails}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="acts">
+          <button class="btn bsm" onclick="openEmailD(${r.id})" title="Email">✉</button>
+          <button class="btn bsm" onclick="event.stopPropagation();openModalRelance(${r.id})" title="Modifier">✏️</button>
+          ${ce(r)?`<button class="btn bsm bs" onclick="marquerFait(${r.id})" title="Traité">✓</button><button class="btn bsm" onclick="archiverRelance(${r.id})" title="Archiver" style="background:var(--surface2)">📁</button><button class="btn bsm bd" onclick="suppRelance(${r.id})" title="Supprimer">✕</button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 function openDetail(id){
@@ -541,61 +698,139 @@ function openDetail(id){
   const icons={create:'🟢',email:'✉️',note:'📝'};
   document.getElementById('detail-content').innerHTML=`
     <div class="dh">
-      <div><div class="dc">${r.client}</div><div class="cr">${r.ref||'—'}</div></div>
-      <span class="badge b${isEch(r)?'e':r.stat[0]}">${isEch(r)?'Échu':r.stat}</span>
+      <div><div class="dc">${r.client}</div><div class="cr">${r.ref||'—'}</div>${r.note?`<div style="font-size:13px;color:var(--muted);margin-top:5px;font-style:italic">📌 ${r.note}</div>`:''}</div>
+      <span class="badge b${isEch(r)?'e':r.stat[0]}" style="font-size:12px;padding:5px 12px">${isEch(r)?'Échu':r.stat}</span>
     </div>
     <div class="dmeta">
       <div class="dmi"><div class="dmil">Priorité</div><div class="dmiv"><span class="badge b${r.prio[0]}">${r.prio}</span></div></div>
       <div class="dmi"><div class="dmil">Échéance</div><div class="dmiv">${echLabel(r)}</div></div>
-      <div class="dmi"><div class="dmil">Assigné à</div><div class="dmiv" style="color:var(--success)">${r.abn}</div></div>
+      <div class="dmi"><div class="dmil">Relances envoyées</div><div class="dmiv" style="color:var(--accent)">${r.tl.filter(t=>t.type==='email').length}</div></div>
+      <div class="dmi"><div class="dmil">Créé par</div><div class="dmiv" style="font-size:12px">${r.cbn}</div></div>
+      <div class="dmi"><div class="dmil">Assigné à</div><div class="dmiv">
+        <select onchange="reassignerRelance(${r.id},this.value)" style="font-size:12px;padding:4px 8px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);background:white;color:var(--success);font-weight:600">
+          ${USERS.map(u=>`<option value="${u.id}" ${u.id===r.ab?'selected':''}>${u.name}</option>`).join('')}
+        </select>
+      </div></div>
+      <div class="dmi"><div class="dmil">Dernière action</div><div class="dmiv" style="font-size:12px">${r.tl.length?dfmt(r.tl[r.tl.length-1].date):'—'}</div></div>
     </div>
-    <div style="margin-bottom:18px">${r.pieces.map(p=>`<span class="ptag" style="font-size:13px;padding:5px 11px">${p}</span>`).join('')}</div>
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:12px">Historique</div>
+    <div style="margin-bottom:18px"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px">Pièces manquantes</div><div>${r.pieces.map(p=>`<span class="ptag" style="font-size:13px;padding:5px 11px">${p}</span>`).join('')}</div></div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Historique des actions</div>
     ${r.tl.map(t=>`<div class="tl-item"><div class="tl-dot tl-${t.type}">${icons[t.type]||'•'}</div><div class="tl-box"><div class="tl-top"><span class="tl-action">${t.action}</span><span class="tl-date">${dfmt(t.date)}</span></div>${t.detail?`<div class="tl-detail">${t.detail}</div>`:''}<div class="tl-by">par ${t.by}</div></div></div>`).join('')}
-    <div class="note-row"><textarea id="ninput" placeholder="Ajouter une note..."></textarea><button class="btn bp bsm" onclick="ajouterNote(${r.id})" style="align-self:flex-end">+ Note</button></div>`;
+    <div class="note-row"><textarea id="ninput" placeholder="Ajouter une note interne..."></textarea><button class="btn bp bsm" onclick="ajouterNote(${r.id})" style="align-self:flex-end;white-space:nowrap">+ Note</button></div>`;
   openModal('mdetail');
+}
+
+async function reassignerRelance(id, newUserId){
+  const r=relances.find(x=>x.id===id);
+  const u=USERS.find(x=>x.id===newUserId);
+  if(!r||!u)return;
+  r.ab=newUserId;r.abn=u.name;
+  r.tl.push({type:'note',action:'Réassignation',detail:`Assigné à ${u.name}`,date:dn(0),by:cu.name});
+  await sbPatch('relances',id,{assigned_to:newUserId,assigned_to_name:u.name,timeline:r.tl});
+  openDetail(id);renderTable();
 }
 
 async function ajouterNote(id){
   const r=relances.find(x=>x.id===id);
   const n=document.getElementById('ninput').value.trim();
   if(!r||!n)return;
-  r.tl.push({type:'note',action:'Note interne',detail:n,date:dn(0),by:cu.name});
+  r.tl.push({type:'note',action:'Note interne ajoutée',detail:n,date:dn(0),by:cu.name});
   await sbPatch('relances',id,{timeline:r.tl});
+  document.getElementById('ninput').value='';
   openDetail(id);renderTable();
 }
 
 async function faitDetail(){
   const r=relances.find(x=>x.id===cdid);
-  if(r){r.tl.push({type:'note',action:'Dossier traité',detail:'',date:dn(0),by:cu.name});await sbPatch('relances',r.id,{statut:'fait',timeline:r.tl});r.stat='fait';}
-  cm('mdetail');renderTable();renderStats();toast('✅ Dossier traité !');
+  if(r){r.tl.push({type:'note',action:'Dossier marqué traité',detail:'',date:dn(0),by:cu.name});await sbPatch('relances',r.id,{statut:'fait',timeline:r.tl});r.stat='fait';}
+  cm('mdetail');renderTable();renderStats();
 }
 
 function emailDetail(){cm('mdetail');openEmailD(cdid);}
 
-const ETPLS={
-  'Permis de conduire':'je me permets de vous relancer concernant votre permis de conduire (recto-verso).',
-  "Carte d'identité":"je me permets de vous relancer concernant votre pièce d'identité (recto-verso).",
-  'RIB / IBAN':'je me permets de vous relancer concernant votre RIB/IBAN nécessaire au prélèvement.',
-  'Kbis':'je me permets de vous relancer concernant votre extrait Kbis.',
-  'Devis signé':'je me permets de vous relancer concernant la signature et le retour du devis.',
-  'Lettre de devoir de conseil':'je me permets de vous relancer concernant la lettre de devoir de conseil.',
-  'Carte grise':'je me permets de vous relancer concernant la carte grise du véhicule.',
-  "Relevé d'information":"je me permets de vous relancer concernant votre relevé d'information assureur.",
-  'PV de restitution':'je me permets de vous relancer concernant le procès-verbal de restitution.',
-  'Bilan comptable':'je me permets de vous relancer concernant votre bilan comptable.',
-};
+const MODAL_STYLE='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+function openModal(id){document.getElementById(id).style.cssText=MODAL_STYLE;}
+function cm(id){document.getElementById(id).style.cssText='';document.getElementById(id).classList.remove('open');}
 
-function emailBody(pieces,delai){
-  const t=ETPLS[pieces&&pieces[0]]||`je me permets de vous relancer concernant : ${(pieces||[]).join(', ')}.`;
-  const list=pieces&&pieces.length>1?'\n\nDocuments attendus :\n'+pieces.map(p=>'  — '+p).join('\n'):'';
-  return `Bonjour,\n\n${t}${list}\n\nSans retour sous ${delai||7} jours, nous pourrions être dans l'impossibilité de traiter votre dossier.\n\nBien cordialement,\n\n${cu?.name||'Luca BAGATELLA'}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`;
+let editRelanceId=null;
+
+function openModalRelance(id=null){
+  editRelanceId=id;
+  const r=id?relances.find(x=>x.id===id):null;
+  // Titre et bouton
+  document.getElementById('mrelance-title').textContent=id?'Modifier la relance':'Nouvelle relance';
+  document.getElementById('mrelance-sub').textContent=id?'Modifiez les informations du dossier':'Renseignez les informations du dossier';
+  document.getElementById('mrelance-btn').textContent=id?'Enregistrer les modifications →':'Créer la relance →';
+  // Remplir les champs
+  document.getElementById('rc').value=r?.client||'';
+  document.getElementById('rref').value=r?.ref||'';
+  document.getElementById('remail').value=r?.email||'';
+  document.getElementById('rprio').value=r?.prio||'normal';
+  document.getElementById('rech').value=r?.ech||dn(7);
+  document.getElementById('rnote').value=r?.note||'';
+  // Pièces
+  document.querySelectorAll('#pgrid input').forEach(cb=>{
+    const checked=r?.pieces?.includes(cb.value)||false;
+    cb.checked=checked;
+    cb.closest('.pcb').classList.toggle('checked',checked);
+  });
+  buildAssign(r?.ab);
+  openModal('mrelance');
+}
+
+async function ajouterRelance(){
+  const client=document.getElementById('rc').value.trim();
+  if(!client){alert('Client obligatoire');return;}
+  const pieces=Array.from(document.querySelectorAll('#pgrid input:checked')).map(cb=>cb.value);
+  if(!pieces.length){alert('Sélectionnez au moins une pièce');return;}
+  const email=document.getElementById('remail').value.trim();
+  const ech=document.getElementById('rech').value||dn(7);
+  const aid=document.getElementById('rassign').value;
+  const au=USERS.find(u=>u.id===aid);
+
+  if(editRelanceId){
+    // MODIFICATION
+    const r=relances.find(x=>x.id===editRelanceId);
+    if(!r)return;
+    r.tl.push({type:'note',action:'Relance modifiée',detail:`Priorité: ${document.getElementById('rprio').value}, Pièces: ${pieces.join(', ')}`,date:dn(0),by:cu.name});
+    const updates={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:ech,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),timeline:r.tl};
+    await sbPatch('relances',editRelanceId,updates);
+    Object.assign(r,{...updates,prio:updates.priorite,ech:updates.echeance,ab:aid,abn:au?.name||cu.name});
+    addLog('Relance modifiée','Client : '+client);
+  }else{
+    // CREATION
+    const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
+    const data={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:ech,statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai:7,timeline:tl};
+    const res=await sbPost('relances',data);
+    if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
+    addLog('Relance créée','Client : '+client);
+  }
+  editRelanceId=null;
+  cm('mrelance');renderTable();renderStats();
+}
+
+async function marquerFait(id){
+  const r=relances.find(x=>x.id===id);
+  if(r){
+    r.tl.push({type:'note',action:'Dossier traité',detail:'',date:dn(0),by:cu.name});
+    await sbPatch('relances',id,{statut:'fait',timeline:r.tl});
+    r.stat='fait';
+    addLog('Dossier traité','Client : '+r.client);
+  }
+  renderTable();renderStats();
+}
+
+async function suppRelance(id){
+  if(!confirm('Supprimer ?'))return;
+  await sbDelete('relances',id);
+  relances=relances.filter(r=>r.id!==id);
+  renderTable();renderStats();
 }
 
 function openEmailD(id){
   const r=relances.find(x=>x.id===id);if(!r)return;
   ceid=id;
-  document.getElementById('emailsub').textContent=`Relance — ${r.client} — ${r.pieces.join(', ')}`;
+  document.getElementById('emailsub').textContent=`Relance pour ${r.client} — ${r.pieces.join(', ')}`;
   document.getElementById('eto').value=r.email||'';
   document.getElementById('esubj').value=`Dossier ${r.client}${r.ref?' ('+r.ref+')':''} — Documents manquants`;
   document.getElementById('ebody').value=emailBody(r.pieces,r.delai);
@@ -608,101 +843,8 @@ async function envoyerEmail(){
   const b=encodeURIComponent(document.getElementById('ebody').value);
   window.location.href=`mailto:${to}?subject=${s}&body=${b}`;
   const r=relances.find(x=>x.id===ceid);
-  if(r){const n=r.tl.filter(t=>t.type==='email').length+1;r.tl.push({type:'email',action:`Email envoyé (n°${n})`,detail:r.pieces.join(', '),date:dn(0),by:cu.name});r.stat='relance';await sbPatch('relances',r.id,{statut:'relance',timeline:r.tl});}
+  if(r){const n=r.tl.filter(t=>t.type==='email').length+1;r.tl.push({type:'email',action:`Email envoyé (relance n°${n})`,detail:r.pieces.join(', '),date:dn(0),by:cu.name});r.stat='relance';await sbPatch('relances',r.id,{statut:'relance',timeline:r.tl});}
   cm('memail');renderTable();renderStats();
-}
-
-function openModalRelance(id=null){
-  editRelanceId=id;
-  const r=id?relances.find(x=>x.id===id):null;
-  document.getElementById('mrelance-title').textContent=id?'Modifier la relance':'Nouvelle relance';
-  document.getElementById('mrelance-btn').textContent=id?'Enregistrer →':'Créer →';
-  document.getElementById('rc').value=r?.client||'';
-  document.getElementById('rref').value=r?.ref||'';
-  document.getElementById('remail').value=r?.email||'';
-  document.getElementById('rprio').value=r?.prio||'normal';
-  document.getElementById('rnote').value=r?.note||'';
-  document.querySelectorAll('#pgrid input').forEach(cb=>{
-    const checked=r?.pieces?.includes(cb.value)||false;
-    cb.checked=checked;cb.closest('.pcb').classList.toggle('checked',checked);
-  });
-  buildAssign(r?.ab);
-  openModal('mrelance');
-}
-
-async function ajouterRelance(){
-  const client=document.getElementById('rc').value.trim();
-  if(!client){alert('Client obligatoire');return;}
-  const pieces=Array.from(document.querySelectorAll('#pgrid input:checked')).map(cb=>cb.value);
-  if(!pieces.length){alert('Sélectionnez au moins une pièce');return;}
-  const email=document.getElementById('remail').value.trim();
-  const delai=parseInt(document.getElementById('rdelai')?.value)||7;
-  const aid=document.getElementById('rassign').value;
-  const au=USERS.find(u=>u.id===aid);
-  const msg=editRelanceId?'✅ Relance modifiée !':'✅ Relance créée !';
-  if(editRelanceId){
-    const r=relances.find(x=>x.id===editRelanceId);
-    if(r){
-      r.tl.push({type:'note',action:'Relance modifiée',detail:pieces.join(', '),date:dn(0),by:cu.name});
-      const updates={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),timeline:r.tl};
-      await sbPatch('relances',editRelanceId,updates);
-      Object.assign(r,{...updates,prio:updates.priorite,ab:aid,abn:au?.name||cu.name});
-    }
-  }else{
-    const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
-    const data={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:dn(delai),statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai,timeline:tl};
-    const res=await sbPost('relances',data);
-    if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
-  }
-  editRelanceId=null;
-  cm('mrelance');renderTable();renderStats();toast(msg);
-}
-
-async function marquerFait(id){
-  const r=relances.find(x=>x.id===id);
-  if(r){r.tl.push({type:'note',action:'Dossier traité',detail:'',date:dn(0),by:cu.name});await sbPatch('relances',id,{statut:'fait',timeline:r.tl});r.stat='fait';}
-  renderTable();renderStats();toast('✅ Dossier traité !');
-}
-
-async function suppRelance(id){
-  if(!confirm('Supprimer ?'))return;
-  await sbDelete('relances',id);
-  relances=relances.filter(r=>r.id!==id);
-  renderTable();renderStats();toast('🗑️ Relance supprimée','info');
-}
-
-function exportExcel(){
-  const rows=[['Client','Référence','Email','Pièces','Priorité','Échéance','Créé par','Assigné à','Statut','Relances']];
-  relances.forEach(r=>rows.push([r.client,r.ref||'',r.email||'',r.pieces.join(', '),r.prio,r.ech||'',r.cbn,r.abn,r.stat,r.tl.filter(t=>t.type==='email').length]));
-  const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(';')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download='relances_gan_'+dn(0)+'.csv';a.click();
-}
-
-function checkEch(){
-  if(!cu)return;
-  const a=relances.filter(r=>r.stat!=='fait'&&r.ech&&r.ech<=dn(0)&&r.ab===cu.id);
-  if(a.length>0)setTimeout(()=>{if(confirm(`⚠️ ${a.length} relance(s) échue(s) :\n\n${a.map(r=>'• '+r.client).join('\n')}\n\nConsulter ?`)){document.getElementById('fstat').value='echue';renderTable();}},600);
-}
-setInterval(checkEch,3600000);
-
-async function changerMdp(){
-  const old=document.getElementById('mdp-old').value;
-  const nv=document.getElementById('mdp-new').value;
-  const conf=document.getElementById('mdp-confirm').value;
-  const err=document.getElementById('mdp-error');
-  const ok=document.getElementById('mdp-success');
-  err.style.display='none';ok.style.display='none';
-  if(old!==cu.pass){err.textContent='Mot de passe actuel incorrect';err.style.display='block';return;}
-  if(nv.length<6){err.textContent='6 caractères minimum';err.style.display='block';return;}
-  if(nv!==conf){err.textContent='Les mots de passe ne correspondent pas';err.style.display='block';return;}
-  try{
-    await fetch(`${SB}/users?id=eq.${cu.id}`,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=representation'},body:JSON.stringify({mdp:nv,password:nv})});
-    cu.pass=nv;localStorage.setItem('gan_session',JSON.stringify({id:cu.id,pass:nv}));
-    ok.style.display='block';
-    ['mdp-old','mdp-new','mdp-confirm'].forEach(id=>document.getElementById(id).value='');
-  }catch(e){err.textContent='Erreur. Réessayez.';err.style.display='block';}
 }
 
 function renderAdmin(){
@@ -713,9 +855,13 @@ function renderAdmin(){
       <div class="ugrid">${us.map(u=>`<div class="ucard"><div style="display:flex;align-items:center;gap:9px"><div class="av" style="width:34px;height:34px;font-size:12px">${u.ini}</div><div><div style="font-weight:600;font-size:14px">${u.name}</div><div style="font-size:11px;color:var(--muted)">${u.id}${u.admin?' • Admin':''}</div></div></div><div class="unums"><div><div class="un" style="color:var(--accent)">${u.ec}</div><div class="ul">En cours</div></div><div><div class="un" style="color:var(--danger)">${u.urg}</div><div class="ul">Urgent</div></div><div><div class="un" style="color:var(--warning)">${u.ech}</div><div class="ul">Échu</div></div><div><div class="un" style="color:var(--success)">${u.fait}</div><div class="ul">Traité</div></div></div></div>`).join('')}</div>
     </div>
     <div class="asec">
-      <div class="atitle">📦 Pièces à relancer</div>
+      <div class="atitle">📦 Gestion des pièces à relancer</div>
       <div class="pmgrid" id="pmlist"></div>
-      <div class="parow"><input type="text" id="npi" placeholder="Nouvelle pièce..." onkeydown="if(event.key==='Enter')ajouterPiece()"><button class="btn bp" onclick="ajouterPiece()">+ Ajouter</button></div>
+      <div class="parow"><input type="text" id="npi" placeholder="Nouvelle pièce à ajouter..." onkeydown="if(event.key==='Enter')ajouterPiece()"><button class="btn bp" onclick="ajouterPiece()">+ Ajouter</button></div>
+    </div>
+    <div class="asec">
+      <div class="atitle">⚠️ Relances critiques</div>
+      ${relances.filter(r=>(isEch(r)||r.prio==='urgent')&&r.stat!=='fait').length===0?'<div class="empty">✅ Aucune relance critique</div>':`<div class="tw"><table><thead><tr><th>Client</th><th>Pièces</th><th>Assigné à</th><th>Échéance</th><th>Relances</th></tr></thead><tbody>${relances.filter(r=>(isEch(r)||r.prio==='urgent')&&r.stat!=='fait').map(r=>`<tr onclick="openDetail(${r.id})"><td><div class="cn">${r.client}</div><div class="cr">${r.ref||'—'}</div></td><td>${r.pieces.map(p=>`<span class="ptag">${p}</span>`).join('')}</td><td>${r.abn}</td><td>${echLabel(r)}</td><td style="text-align:center;font-weight:600;color:var(--accent)">${r.tl.filter(t=>t.type==='email').length}</td></tr>`).join('')}</tbody></table></div>`}
     </div>`;
   renderPM();
 }
@@ -724,12 +870,36 @@ function renderPM(){
   const el=document.getElementById('pmlist');if(!el)return;
   el.innerHTML=PIECES.map((p,i)=>`<div class="pmitem"><span class="pmname">${p}</span><button class="btn bsm bd" onclick="suppPiece(${i})">✕</button></div>`).join('');
 }
-function ajouterPiece(){const v=document.getElementById('npi').value.trim();if(!v||PIECES.includes(v))return;PIECES.push(v);document.getElementById('npi').value='';buildPG();renderPM();}
-function suppPiece(i){if(!confirm('Supprimer ?'))return;PIECES.splice(i,1);buildPG();renderPM();}
 
-let editPrevId2=null;
+function ajouterPiece(){
+  const v=document.getElementById('npi').value.trim();
+  if(!v)return;if(PIECES.includes(v)){alert('Pièce déjà existante');return;}
+  PIECES.push(v);document.getElementById('npi').value='';buildPG();renderPM();
+}
+
+function suppPiece(i){if(!confirm(`Supprimer "${PIECES[i]}" ?`))return;PIECES.splice(i,1);buildPG();renderPM();}
+
+function checkEch(){
+  const a=relances.filter(r=>r.stat!=='fait'&&r.ech<=dn(0)&&r.ab===cu.id);
+  if(a.length>0)setTimeout(()=>{if(confirm(`⚠️ ${a.length} relance(s) échue(s) vous sont assignées :\n\n${a.map(r=>`• ${r.client} — ${r.pieces.join(', ')}`).join('\n')}\n\nConsulter ?`)){document.getElementById('fstat').value='';renderTable();}},600);
+  // Vérification prévention
+  const p=prevData.filter(x=>x.stat!=='archivé'&&x.expiry&&x.expiry<=dn(30)&&x.assign===cu.id);
+  if(p.length>0)setTimeout(()=>{if(confirm(`🔥 ${p.length} document(s) prévention expirant dans moins de 30 jours :\n\n${p.map(x=>`• ${x.client} — ${x.type}`).join('\n')}\n\nConsulter ?`)){showPage('prevention');}},1200);
+  // Vérification flottes
+  const f=flotteData.filter(x=>x.ech&&x.ech<=dn(parseInt(x.rappel||60))&&x.stat!=='archivé'&&x.assign===cu.id);
+  if(f.length>0)setTimeout(()=>{if(confirm(`🚗 ${f.length} contrat(s) flotte arrivant à échéance :\n\n${f.map(x=>`• ${x.client} — ${x.ref}`).join('\n')}\n\nConsulter ?`)){showPage('flotte');}},1800);
+}
+setInterval(checkEch,3600000);
+
+// Restaurer la session au chargement de la page
+loadAll().then(()=>restoreSession());
+
+// ===== PREVENTION =====
+let editPrevId=null;
+
 function statGlobal(x){
-  const td=x.typesData||{};const tous=x.types.map(t=>td[t]||{stat:'attente'});
+  const td=x.typesData||{};
+  const tous=x.types.map(t=>td[t]||{stat:'attente'});
   if(tous.every(t=>t.stat==='recu'))return'recu';
   if(tous.some(t=>t.stat==='recu'))return'partiel';
   return'attente';
@@ -739,55 +909,115 @@ function renderPrevention(){
   const search=document.getElementById('prev-search')?.value.toLowerCase()||'';
   const fstat=document.getElementById('prev-fstat')?.value||'';
   const ftype=document.getElementById('prev-ftype')?.value||'';
+  const fassign=document.getElementById('prev-fassign')?.value||'';
+
   let list=prevData.filter(x=>{
     if(search&&!x.client.toLowerCase().includes(search))return false;
+    if(fassign&&x.assign!==fassign)return false;
     if(ftype&&!x.types.includes(ftype))return false;
     const sg=statGlobal(x);
+    const hasExpire=x.types.some(t=>{const td=x.typesData?.[t];return td?.stat==='recu'&&td?.expiry&&new Date(td.expiry)<new Date();});
     if(fstat==='attente'&&sg!=='attente')return false;
     if(fstat==='recu'&&sg!=='recu')return false;
     if(fstat==='partiel'&&sg!=='partiel')return false;
+    if(fstat==='expire'&&!hasExpire)return false;
     return true;
+  }).sort((a,b)=>{
+    const p={attente:0,partiel:1,recu:2};
+    return p[statGlobal(a)]-p[statGlobal(b)];
   });
+
   const typeIcon={'Extincteurs mobiles':'🧯','Vérification électrique':'⚡','Thermographie':'🌡️','Rapport sécurité incendie':'🔥','Exutoire de fumées':'💨'};
+
   const expLabelT=td=>{
     if(!td||td.stat==='attente')return`<span class="ba">⏳ En attente</span>`;
     if(!td.expiry)return`<span class="bn">✅ Reçu</span>`;
     const d=Math.ceil((new Date(td.expiry)-new Date())/86400000);
-    if(d<0)return`<span class="be">⚠ Expiré</span>`;
-    if(d<=30)return`<span class="bu">⏰ ${dfmt(td.expiry)}</span>`;
-    return`<span class="bn">✅ ${dfmt(td.expiry)}</span>`;
+    const ds=dfmt(td.expiry);
+    if(d<0)return`<span class="be">⚠ Expiré (${Math.abs(d)}j)</span>`;
+    if(d<=30)return`<span class="bu">⏰ ${ds} (${d}j)</span>`;
+    return`<span class="bn">✅ ${ds}</span>`;
   };
+
+  const total=prevData.length;
+  const attente=prevData.filter(x=>statGlobal(x)==='attente').length;
+  const partiel=prevData.filter(x=>statGlobal(x)==='partiel').length;
+  const expires=prevData.filter(x=>{
+    return x.types.some(t=>{const td=x.typesData?.[t];return td?.stat==='recu'&&td?.expiry&&new Date(td.expiry)<new Date();});
+  }).length;
+
   document.getElementById('prev-content').innerHTML=`
+    <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+      <div class="sc sb"><div class="sn">${total}</div><div class="sl2">Total suivis</div></div>
+      <div class="sc sr"><div class="sn">${attente}</div><div class="sl2">En attente</div></div>
+      <div class="sc so"><div class="sn">${partiel}</div><div class="sl2">Partiellement reçus</div></div>
+      <div class="sc" style="border-left:3px solid var(--danger)"><div class="sn" style="color:var(--danger)">${expires}</div><div class="sl2">Expirés</div></div>
+    </div>
     <div class="toolbar">
       <div class="tleft">
+        <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
+          <button id="pvtab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setPrevVue('mes')">👤 Mes suivis</button>
+          <button id="pvtab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setPrevVue('all')">🌐 Tous</button>
+        </div>
         <input class="sinput" type="text" placeholder="🔍 Rechercher..." oninput="renderPrevention()" id="prev-search">
         <select class="fsel" onchange="renderPrevention()" id="prev-fstat">
           <option value="">Tous statuts</option>
           <option value="attente">⏳ En attente</option>
-          <option value="partiel">📥 Partiel</option>
-          <option value="recu">✅ Reçu</option>
+          <option value="partiel">📥 Partiellement reçu</option>
+          <option value="recu">✅ Tout reçu</option>
+          <option value="expire">🔴 Expiré</option>
         </select>
         <select class="fsel" onchange="renderPrevention()" id="prev-ftype">
           <option value="">Tous types</option>
           <option value="Extincteurs mobiles">🧯 Extincteurs</option>
           <option value="Vérification électrique">⚡ Électrique</option>
           <option value="Thermographie">🌡️ Thermographie</option>
-          <option value="Rapport sécurité incendie">🔥 Incendie</option>
-          <option value="Exutoire de fumées">💨 Exutoire</option>
+          <option value="Rapport sécurité incendie">🔥 Sécurité incendie</option>
+          <option value="Exutoire de fumées">💨 Exutoire fumées</option>
+        </select>
+        <select class="fsel" onchange="renderPrevention()" id="prev-fassign">
+          <option value="">Tous collaborateurs</option>
+          ${USERS.map(u=>`<option value="${u.id}"${u.id===cu.id?' selected':''}>${u.name}</option>`).join('')}
         </select>
       </div>
       <button class="btn bp" onclick="openPrev()">+ Nouveau suivi</button>
     </div>
-    <div class="tw"><table>
-      <thead><tr><th>Client</th><th>Statut</th><th>Détail</th><th>Assigné à</th><th>Actions</th></tr></thead>
-      <tbody>${list.length===0?'<tr><td colspan="5" class="empty">Aucun suivi</td></tr>':list.map(x=>{
-        const sg=statGlobal(x);
-        const sgLabel=sg==='recu'?'<span class="badge bn">✅ Tout reçu</span>':sg==='partiel'?'<span class="badge ba">📥 Partiel</span>':'<span class="badge bu">⏳ En attente</span>';
-        const td=x.typesData||{};
-        const detail=x.types.map(t=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span>${typeIcon[t]||'📄'}</span><span style="font-size:12px;min-width:150px">${t}</span><span style="font-size:11px">${expLabelT(td[t])}</span>${(!td[t]||td[t].stat==='attente')?`<button class="btn bsm bp" style="padding:3px 8px;font-size:11px" onclick="recevoirType(${x.id},'${t}')">📥</button>`:`<button class="btn bsm" style="padding:3px 8px;font-size:11px" onclick="renouvelerType(${x.id},'${t}')">🔄</button>`}</div>`).join('');
-        return`<tr><td><div class="cn">${x.client}</div><div class="cr">${x.ref||'—'}</div></td><td>${sgLabel}</td><td>${detail}</td><td><div style="display:flex;align-items:center;gap:5px"><div class="av avg">${USERS.find(u=>u.id===x.assign)?.ini||'?'}</div><span style="font-size:12px">${x.abn}</span></div></td><td><div class="acts" style="flex-direction:column"><button class="btn bsm" onclick="emailPrev(${x.id})">✉</button><button class="btn bsm" onclick="openPrev(${x.id})">✏️</button><button class="btn bsm bd" onclick="suppPrev(${x.id})">✕</button></div></td></tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
+    <div class="tw">
+      <table>
+        <thead><tr><th>Client</th><th>Statut global</th><th>Détail par vérification</th><th>Assigné à</th><th>Actions</th></tr></thead>
+        <tbody>${list.length===0?`<tr><td colspan="5" class="empty">Aucun suivi trouvé</td></tr>`:list.map(x=>{
+          const sg=statGlobal(x);
+          const sgLabel=sg==='recu'?`<span class="badge bn">✅ Tout reçu</span>`:sg==='partiel'?`<span class="badge" style="background:#FFF3E0;color:#E65100">📥 Partiel</span>`:`<span class="badge ba">⏳ En attente</span>`;
+          const td=x.typesData||{};
+          const detail=x.types.map(t=>`
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <span style="font-size:13px">${typeIcon[t]||'📄'}</span>
+              <span style="font-size:12px;font-weight:500;min-width:160px">${t}</span>
+              <span style="font-size:11px">${expLabelT(td[t])}</span>
+              ${td[t]?.stat==='recu'&&td[t]?.expiry?`<span style="font-size:11px;color:var(--muted);margin-left:2px">— expire le <strong>${dfmt(td[t].expiry)}</strong></span>`:''}
+              ${(!td[t]||td[t].stat==='attente')?`<button class="btn bsm bp" style="padding:3px 8px;font-size:11px" onclick="recevoirType(${x.id},'${t}')">📥</button>`:`<button class="btn bsm" style="padding:3px 8px;font-size:11px" onclick="renouvelerType(${x.id},'${t}')">🔄</button>`}
+            </div>`).join('');
+          return`<tr>
+            <td>
+              <div class="cn">${x.client}</div>
+              <div class="cr">${x.ref||'—'}</div>
+              ${x.note?`<div class="cr" style="font-style:italic">${x.note}</div>`:''}
+            </td>
+            <td>${sgLabel}</td>
+            <td>${detail}</td>
+            <td><div style="display:flex;align-items:center;gap:5px"><div class="av avg">${USERS.find(u=>u.id===x.assign)?.ini||'?'}</div><span style="font-size:12px">${x.abn}</span></div></td>
+            <td>
+              <div class="acts" style="flex-direction:column;align-items:flex-start">
+                <button class="btn bsm" onclick="emailPrev(${x.id})">✉ Email</button>
+                <button class="btn bsm" onclick="editPrev(${x.id})">✏️ Modifier</button>
+                <button class="btn bsm bd" onclick="suppPrev(${x.id})">✕ Supprimer</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
 }
 
 function openPrev(id=null){
@@ -796,11 +1026,16 @@ function openPrev(id=null){
   document.getElementById('mprev-title').textContent=id?'Modifier le suivi':'Nouveau suivi prévention';
   document.getElementById('pv-client').value=x?.client||'';
   document.getElementById('pv-ref').value=x?.ref||'';
-  document.getElementById('pv-email').value=x?.email||'';
   document.getElementById('pv-note').value=x?.note||'';
+  document.getElementById('pv-email').value=x?.email||'';
+  // Réinitialiser toutes les checkboxes
   document.querySelectorAll('#mprev input[type=checkbox]').forEach(cb=>{
-    cb.checked=x?.types?.includes(cb.value)||false;
-    cb.closest('.pcb').classList.toggle('checked',cb.checked);
+    cb.checked=false;cb.closest('.pcb').classList.remove('checked');
+  });
+  // Cocher les types existants
+  const existingTypes=x?.types||[];
+  document.querySelectorAll('#mprev input[type=checkbox]').forEach(cb=>{
+    if(existingTypes.includes(cb.value)){cb.checked=true;cb.closest('.pcb').classList.add('checked');}
   });
   const sel=document.getElementById('pv-assign');sel.innerHTML='';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((x?.assign||cu.id)===u.id)o.selected=true;sel.appendChild(o);});
@@ -811,11 +1046,10 @@ async function savePrev(){
   const client=document.getElementById('pv-client').value.trim();
   if(!client){alert('Client obligatoire');return;}
   const types=Array.from(document.querySelectorAll('#mprev input[type=checkbox]:checked')).map(cb=>cb.value);
-  if(!types.length){alert('Sélectionnez au moins un type');return;}
+  if(!types.length){alert('Sélectionnez au moins un type de vérification');return;}
   const aid=document.getElementById('pv-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const email=document.getElementById('pv-email').value.trim();
-  const data={client,ref:document.getElementById('pv-ref').value.trim(),types,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('pv-note').value.trim(),email};
+  const data={client,ref:document.getElementById('pv-ref').value.trim(),types,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('pv-note').value.trim(),email:document.getElementById('pv-email').value.trim()};
   if(editPrevId){
     const p=prevData.find(x=>x.id===editPrevId);
     if(!p.typesData)p.typesData={};
@@ -828,13 +1062,13 @@ async function savePrev(){
     const res=await sbPost('prevention',{...data,types_data:typesData});
     if(res&&res[0])prevData.unshift({...res[0],types,typesData,assign:aid,abn:au?.name||cu.name});
   }
-  cm('mprev');renderPrevention();toast(editPrevId?'✅ Suivi modifié !':'✅ Suivi créé !');
+  cm('mprev');renderPrevention();
 }
 
-async function recevoirType(id,type){
+async function recevoirType(id, type){
   const x=prevData.find(p=>p.id===id);if(!x)return;
   if(!x.typesData)x.typesData={};
-  const date=prompt(`Document reçu : ${type}\nDate (JJ/MM/AAAA) :`);
+  const date=prompt(`Document reçu : ${type}\nDate du document (JJ/MM/AAAA) :`);
   if(!date)return;
   const parts=date.split('/');
   if(parts.length===3){
@@ -842,12 +1076,12 @@ async function recevoirType(id,type){
     const exp=new Date(d+'T12:00:00');exp.setFullYear(exp.getFullYear()+1);
     x.typesData[type]={stat:'recu',date:d,expiry:exp.toISOString().split('T')[0]};
     await sbPatch('prevention',id,{types_data:x.typesData});
-    toast('✅ Document enregistré !');
+    alert(`✅ ${type} enregistré.\nExpiration : ${dfmt(x.typesData[type].expiry)}`);
   }
   renderPrevention();
 }
 
-async function renouvelerType(id,type){
+async function renouvelerType(id, type){
   const x=prevData.find(p=>p.id===id);if(!x)return;
   if(!confirm(`Remettre "${type}" en attente ?`))return;
   if(!x.typesData)x.typesData={};
@@ -856,19 +1090,32 @@ async function renouvelerType(id,type){
   renderPrevention();
 }
 
+function editPrev(id){openPrev(id);}
 async function suppPrev(id){
-  if(!confirm('Supprimer ?'))return;
+  if(!confirm('Supprimer ce suivi ?'))return;
   await sbDelete('prevention',id);
   prevData=prevData.filter(p=>p.id!==id);
-  renderPrevention();toast('🗑️ Suivi supprimé','info');
+  renderPrevention();
 }
 
 function emailPrev(id){
   const x=prevData.find(p=>p.id===id);if(!x)return;
   const typesStr=(x.types||[]).join(', ');
-  const s=encodeURIComponent(`${x.client} — Documents prévention`);
-  const b=encodeURIComponent(`Bonjour,\n\nDans le cadre du suivi de vos obligations contractuelles, je me permets de vous relancer concernant :\n\n${(x.types||[]).map(t=>'  — '+t).join('\n')}\n\nMerci de nous faire parvenir ces documents dans les meilleurs délais.\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances`);
+  const s=encodeURIComponent(`${x.client} — Documents prévention demandés`);
+  const b=encodeURIComponent(`Bonjour,\n\nDans le cadre du suivi de vos obligations contractuelles, je me permets de vous relancer concernant la transmission des justificatifs suivants :\n\n${(x.types||[]).map(t=>'  — '+t).join('\n')}\n\nCes documents sont nécessaires pour garantir la validité de vos garanties assurantielles. Sans ces documents, votre couverture pourrait être remise en cause en cas de sinistre.\n\nMerci de bien vouloir nous faire parvenir ces justificatifs dans les meilleurs délais.\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
   window.location.href=`mailto:${x.email||''}?subject=${s}&body=${b}`;
+}
+
+// ===== FLOTTE =====
+let editFltId=null;
+
+function echLabelF(x){
+  if(!x.ech)return'—';
+  const d=Math.ceil((new Date(x.ech)-new Date())/86400000);
+  const ds=dfmt(x.ech);
+  if(d<0)return`<span class="el">⚠ Échu — à traiter</span>`;
+  if(d<=parseInt(x.rappel||60))return`<span class="ew">⏰ ${ds} (${d}j)</span>`;
+  return`<span class="eok">📅 ${ds}</span>`;
 }
 
 function renderFlotte(){
@@ -879,24 +1126,23 @@ function renderFlotte(){
     if(fa&&x.assign!==fa)return false;
     return true;
   }).sort((a,b)=>(a.ech||'9').localeCompare(b.ech||'9'));
+
   const alertes=flotteData.filter(x=>x.ech&&Math.ceil((new Date(x.ech)-new Date())/86400000)<=parseInt(x.rappel||60)).length;
   const echues=flotteData.filter(x=>x.ech&&Math.ceil((new Date(x.ech)-new Date())/86400000)<0).length;
-  const echLabelF=x=>{
-    if(!x.ech)return'—';
-    const d=Math.ceil((new Date(x.ech)-new Date())/86400000);
-    if(d<0)return`<span class="el">⚠ Échu</span>`;
-    if(d<=parseInt(x.rappel||60))return`<span class="ew">⏰ ${dfmt(x.ech)} (${d}j)</span>`;
-    return`<span class="eok">📅 ${dfmt(x.ech)}</span>`;
-  };
+
   document.getElementById('flotte-content').innerHTML=`
     <div class="stats" style="grid-template-columns:repeat(4,1fr)">
-      <div class="sc sb"><div class="sn">${flotteData.length}</div><div class="sl2">Contrats</div></div>
+      <div class="sc sb"><div class="sn">${flotteData.length}</div><div class="sl2">Contrats suivis</div></div>
       <div class="sc"><div class="sn">${flotteData.reduce((s,x)=>s+(parseInt(x.nb)||0),0)}</div><div class="sl2">Véhicules</div></div>
-      <div class="sc so"><div class="sn">${alertes}</div><div class="sl2">Alertes</div></div>
-      <div class="sc sr"><div class="sn">${echues}</div><div class="sl2">Échus</div></div>
+      <div class="sc so"><div class="sn">${alertes}</div><div class="sl2">Échéances proches</div></div>
+      <div class="sc sr"><div class="sn">${echues}</div><div class="sl2">À traiter</div></div>
     </div>
     <div class="toolbar">
       <div class="tleft">
+        <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
+          <button id="flttab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setFltVue('mes')">👤 Mes contrats</button>
+          <button id="flttab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setFltVue('all')">🌐 Tous</button>
+        </div>
         <input class="sinput" type="text" placeholder="🔍 Rechercher..." oninput="renderFlotte()" id="flt-search">
         <select class="fsel" onchange="renderFlotte()" id="flt-assign">
           <option value="">Tous collaborateurs</option>
@@ -905,23 +1151,33 @@ function renderFlotte(){
       </div>
       <button class="btn bp" onclick="openFlotte()">+ Nouveau contrat</button>
     </div>
-    <div class="tw"><table>
-      <thead><tr><th>Client</th><th>N° Contrat</th><th>Véhicules</th><th>Échéance</th><th>Rappel</th><th>Assigné à</th><th>Actions</th></tr></thead>
-      <tbody>${list.length===0?'<tr><td colspan="7" class="empty">Aucun contrat</td></tr>':list.map(x=>`<tr>
-        <td><div class="cn">${x.client}</div>${x.note?`<div class="cr">${x.note}</div>`:''}</td>
-        <td><div class="cr" style="font-size:13px;font-weight:500">${x.ref}</div></td>
-        <td style="text-align:center;font-weight:700;color:var(--accent)">${x.nb||'—'}</td>
-        <td>${echLabelF(x)}</td>
-        <td style="font-size:12px;color:var(--muted)">${x.rappel}j avant</td>
-        <td><div style="display:flex;align-items:center;gap:5px"><div class="av avg">${USERS.find(u=>u.id===x.assign)?.ini||'?'}</div><span style="font-size:12px">${x.abn}</span></div></td>
-        <td><div class="acts">
-          <button class="btn bsm bs" onclick="validerFlotte(${x.id})">✓</button>
-          <button class="btn bsm" onclick="emailFlotte(${x.id})">✉</button>
-          <button class="btn bsm" onclick="openFlotte(${x.id})">✏️</button>
-          <button class="btn bsm bd" onclick="suppFlotte(${x.id})">✕</button>
-        </div></td>
-      </tr>`).join('')}</tbody>
-    </table></div>`;
+    <div class="tw">
+      <table>
+        <thead><tr><th>Client</th><th>N° Contrat</th><th>Véhicules</th><th>Prochaine échéance</th><th>Rappel</th><th>Dernière validation</th><th>Assigné à</th><th>Actions</th></tr></thead>
+        <tbody>${list.length===0?`<tr><td colspan="8" class="empty">Aucun contrat trouvé</td></tr>`:list.map(x=>{
+          const last=x.historique?.length?x.historique[x.historique.length-1]:null;
+          return`<tr>
+            <td><div class="cn">${x.client}</div>${x.note?`<div class="cr" style="font-style:italic">${x.note}</div>`:''}</td>
+            <td><div class="cr" style="font-size:13px;font-weight:500">${x.ref}</div></td>
+            <td style="text-align:center;font-weight:700;font-size:15px;color:var(--accent)">${x.nb||'—'}</td>
+            <td>${echLabelF(x)}</td>
+            <td style="font-size:12px;color:var(--muted)">${x.rappel} jours avant</td>
+            <td style="font-size:12px">${last?`<span style="color:var(--success)">✅ ${dfmt(last.date)}</span><div class="cr">${last.by}</div>`:'<span style="color:var(--muted)">—</span>'}</td>
+            <td><div style="display:flex;align-items:center;gap:5px"><div class="av avg">${USERS.find(u=>u.id===x.assign)?.ini||'?'}</div><span style="font-size:12px">${x.abn}</span></div></td>
+            <td>
+              <div class="acts">
+                <button class="btn bsm bs" onclick="validerFlotte(${x.id})" title="Valider l'échéance">✓ Valider</button>
+                <button class="btn bsm" onclick="emailFlotte(${x.id})" title="Email client">✉</button>
+                <button class="btn bsm" onclick="editFlotte(${x.id})" title="Modifier">✏️</button>
+                <button class="btn bsm" onclick="historiqueFlotte(${x.id})" title="Historique">📋</button>
+                <button class="btn bsm bd" onclick="suppFlotte(${x.id})" title="Supprimer">✕</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
 }
 
 function openFlotte(id=null){
@@ -930,7 +1186,6 @@ function openFlotte(id=null){
   document.getElementById('mflotte-title').textContent=id?'Modifier le contrat':'Nouveau contrat flotte';
   document.getElementById('fl-client').value=x?.client||'';
   document.getElementById('fl-ref').value=x?.ref||'';
-  document.getElementById('fl-email').value=x?.email||'';
   document.getElementById('fl-nb').value=x?.nb||'';
   document.getElementById('fl-ech').value=x?.ech||'';
   document.getElementById('fl-rappel').value=x?.rappel||'60';
@@ -946,51 +1201,329 @@ async function saveFlotte(){
   if(!client||!ref){alert('Client et N° contrat obligatoires');return;}
   const aid=document.getElementById('fl-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const email=document.getElementById('fl-email').value.trim();
-  const data={client,ref,nb:parseInt(document.getElementById('fl-nb').value)||0,echeance:document.getElementById('fl-ech').value||null,rappel:parseInt(document.getElementById('fl-rappel').value)||60,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim(),email};
+  const data={client,ref,nb:document.getElementById('fl-nb').value,echeance:document.getElementById('fl-ech').value,rappel:document.getElementById('fl-rappel').value,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim()};
   if(editFltId){
     const f=flotteData.find(x=>x.id===editFltId);
     Object.assign(f,{...data,assign:aid,abn:au?.name||cu.name,ech:data.echeance});
     await sbPatch('flotte',editFltId,data);
-    toast('✅ Contrat modifié !');
   }else{
     const res=await sbPost('flotte',{...data,historique:[]});
     if(res&&res[0])flotteData.unshift({...res[0],assign:aid,abn:au?.name||cu.name,ech:data.echeance,historique:[]});
-    toast('✅ Contrat créé !');
   }
   cm('mflotte');renderFlotte();
 }
 
 async function validerFlotte(id){
   const x=flotteData.find(f=>f.id===id);if(!x)return;
-  const note=prompt(`Validation — ${x.client} (${x.ref})\nNote :`,'Parc validé');
+  const note=prompt(`Validation échéance ${x.client} (${x.ref})\n\nNote de validation (état du parc, observations...) :`,'État du parc validé');
   if(note===null)return;
+  // Enregistrer la validation
   if(!x.historique)x.historique=[];
-  x.historique.push({date:dn(0),by:cu.name,note:note||'Validation'});
+  x.historique.push({date:dn(0),by:cu.name,note:note||'Validation sans note'});
+  // Recalculer la prochaine échéance (+1 an)
   const next=new Date((x.ech||x.echeance)+'T12:00:00');
   next.setFullYear(next.getFullYear()+1);
   x.ech=next.toISOString().split('T')[0];
   await sbPatch('flotte',id,{echeance:x.ech,historique:x.historique});
-  toast('✅ Validé ! Prochaine échéance : '+dfmt(x.ech));
+  alert(`✅ Validation enregistrée !\nProchaine échéance : ${dfmt(x.ech)}`);
   renderFlotte();
 }
 
-async function suppFlotte(id){
-  if(!confirm('Supprimer ?'))return;
-  await sbDelete('flotte',id);
-  flotteData=flotteData.filter(f=>f.id!==id);
-  renderFlotte();toast('🗑️ Contrat supprimé','info');
+function historiqueFlotte(id){
+  const x=flotteData.find(f=>f.id===id);if(!x)return;
+  if(!x.historique||!x.historique.length){alert(`Aucun historique pour ${x.client}`);return;}
+  const h=x.historique.map(e=>`📅 ${dfmt(e.date)} — par ${e.by}\n   ${e.note}`).join('\n\n');
+  alert(`Historique — ${x.client} (${x.ref})\n\n${h}`);
 }
+
+function editFlotte(id){openFlotte(id);}
+async function suppFlotte(id){if(!confirm('Supprimer ce contrat ?'))return;await sbDelete('flotte',id);flotteData=flotteData.filter(f=>f.id!==id);renderFlotte();}
 
 function emailFlotte(id){
   const x=flotteData.find(f=>f.id===id);if(!x)return;
   const d=x.ech?dfmt(x.ech):'prochainement';
-  const s=encodeURIComponent(`${x.client} — Flotte automobile — Échéance ${d}`);
-  const b=encodeURIComponent(`Bonjour,\n\nJe vous contacte concernant votre contrat flotte (réf. ${x.ref}).\n\nVotre échéance est le ${d}. Pourriez-vous me communiquer l'état de votre parc ?\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances`);
-  window.location.href=`mailto:${x.email||''}?subject=${s}&body=${b}`;
+  const s=encodeURIComponent(`${x.client} — Point flotte automobile — Échéance ${d}`);
+  const b=encodeURIComponent(`Bonjour,\n\nJe me permets de vous contacter dans le cadre du suivi de votre contrat flotte automobile (réf. ${x.ref}).\n\nVotre contrat arrive à échéance le ${d}. Afin de préparer au mieux le renouvellement, il est nécessaire de procéder à l'état de votre parc véhicules (entrées, sorties, modifications).\n\nPourriez-vous me communiquer l'état actuel de votre parc ou me proposer un créneau pour en faire le point ensemble ?\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
+  window.location.href=`mailto:?subject=${s}&body=${b}`;
 }
 
-loadAll().then(()=>restoreSession());
+// ===== LOGS =====
+let activityLogs=[];
+function addLog(action,detail,module='relances'){
+  activityLogs.unshift({date:new Date().toISOString(),by:cu?.name||'?',action,detail,module});
+  if(activityLogs.length>500)activityLogs=activityLogs.slice(0,500);
+}
+
+// ===== ARCHIVES =====
+let archives=[];
+
+function archiverRelance(id){
+  const r=relances.find(x=>x.id===id);
+  if(!r)return;
+  r.archived=true;
+  r.archivedDate=dn(0);
+  r.archivedBy=cu.name;
+  archives.unshift({...r,type:'relance'});
+  relances=relances.filter(x=>x.id!==id);
+  addLog('Archivage','Dossier '+r.client+' archivé','relances');
+  renderTable();renderStats();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const today=dn(0);
+  const urgentes=relances.filter(r=>r.stat!=='fait'&&r.prio==='urgent');
+  const echues=relances.filter(r=>r.stat!=='fait'&&isEch(r));
+  const aujRelances=relances.filter(r=>r.ech===today&&r.stat!=='fait');
+  const prevExp=prevData.filter(x=>x.types.some(t=>{const td=x.typesData?.[t];return td?.expiry&&new Date(td.expiry)<new Date();}));
+  const prevBientot=prevData.filter(x=>x.types.some(t=>{const td=x.typesData?.[t];if(!td?.expiry)return false;const d=Math.ceil((new Date(td.expiry)-new Date())/86400000);return d>=0&&d<=30;}));
+  const flotteAlert=flotteData.filter(x=>x.ech&&Math.ceil((new Date(x.ech)-new Date())/86400000)<=parseInt(x.rappel||60));
+  const mesRelances=relances.filter(r=>r.ab===cu.id&&r.stat!=='fait');
+
+  document.getElementById('dashboard-content').innerHTML=`
+    <div style="margin-bottom:20px">
+      <div style="font-family:var(--fd);font-size:22px;font-weight:700;margin-bottom:4px">Bonjour ${cu.name.split(' ')[0]} 👋</div>
+      <div style="font-size:13px;color:var(--muted)">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:24px">
+      <div class="sc sb" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${relances.filter(r=>r.stat!=='fait').length}</div><div class="sl2">Relances en cours</div></div>
+      <div class="sc sr" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${urgentes.length}</div><div class="sl2">Urgentes</div></div>
+      <div class="sc so" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${echues.length}</div><div class="sl2">Échues</div></div>
+      <div class="sc" style="cursor:pointer" onclick="showPage('prevention')"><div class="sn" style="color:var(--danger)">${prevExp.length}</div><div class="sl2">Préventions expirées</div></div>
+      <div class="sc" style="cursor:pointer" onclick="showPage('flotte')"><div class="sn" style="color:var(--warning)">${flotteAlert.length}</div><div class="sl2">Flottes à traiter</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <div class="asec">
+        <div class="atitle">⚡ Mes relances urgentes</div>
+        ${mesRelances.filter(r=>r.prio==='urgent'||isEch(r)).length===0
+          ?'<div class="empty" style="padding:20px">✅ Aucune urgence !</div>'
+          :mesRelances.filter(r=>r.prio==='urgent'||isEch(r)).slice(0,5).map(r=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)" onclick="showPage('relances')" style="cursor:pointer">
+              <span class="badge b${r.prio[0]}">${r.prio}</span>
+              <div style="flex:1"><div style="font-weight:600;font-size:13px">${r.client}</div><div style="font-size:11px;color:var(--muted)">${r.pieces.join(', ')}</div></div>
+              <div style="font-size:11px">${echLabel(r)}</div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📅 Échéances du jour</div>
+        ${[...aujRelances.map(r=>({label:r.client,sub:'Relance — '+r.pieces.join(', '),badge:'📋',module:'relances'})),
+           ...flotteAlert.filter(x=>x.ech===today).map(x=>({label:x.client,sub:'Flotte — '+x.ref,badge:'🚗',module:'flotte'})),
+           ...prevBientot.map(x=>({label:x.client,sub:'Prévention — expire bientôt',badge:'🔥',module:'prevention'}))
+          ].length===0
+          ?'<div class="empty" style="padding:20px">✅ Rien à traiter aujourd\'hui !</div>'
+          :[...aujRelances.map(r=>({label:r.client,sub:'Relance — '+r.pieces.join(', '),badge:'📋',module:'relances'})),
+             ...flotteAlert.filter(x=>x.ech===today).map(x=>({label:x.client,sub:'Flotte — '+x.ref,badge:'🚗',module:'flotte'})),
+             ...prevBientot.map(x=>({label:x.client,sub:'Prévention — expire bientôt',badge:'🔥',module:'prevention'}))
+            ].slice(0,6).map(item=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showPage('${item.module}')">
+              <span style="font-size:18px">${item.badge}</span>
+              <div><div style="font-weight:600;font-size:13px">${item.label}</div><div style="font-size:11px;color:var(--muted)">${item.sub}</div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">🔥 Préventions expirées ou bientôt</div>
+        ${[...prevExp,...prevBientot].length===0
+          ?'<div class="empty" style="padding:20px">✅ Tout est à jour !</div>'
+          :[...prevExp,...prevBientot].slice(0,5).map(x=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showPage('prevention')">
+              <div style="flex:1"><div style="font-weight:600;font-size:13px">${x.client}</div><div style="font-size:11px;color:var(--muted)">${x.types.join(', ')}</div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📜 Dernières actions</div>
+        ${activityLogs.length===0
+          ?'<div class="empty" style="padding:20px">Aucune activité récente</div>'
+          :activityLogs.slice(0,5).map(l=>`
+            <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">${l.action}</span><span style="font-size:11px;color:var(--muted)">${dfmt(l.date.split('T')[0])}</span></div>
+              <div style="font-size:12px;color:var(--muted)">${l.detail} — par ${l.by}</div>
+            </div>`).join('')}
+      </div>
+
+    </div>`;
+}
+
+// ===== ARCHIVES =====
+function renderArchives(){
+  document.getElementById('archives-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">📁 Dossiers archivés (${archives.length})</div>
+      ${archives.length===0
+        ?'<div class="empty">Aucun dossier archivé</div>'
+        :`<div class="tw"><table>
+          <thead><tr><th>Client</th><th>Pièces</th><th>Archivé le</th><th>Par</th><th>Actions</th></tr></thead>
+          <tbody>${archives.map((r,i)=>`
+            <tr>
+              <td><div class="cn">${r.client}</div><div class="cr">${r.ref||'—'}</div></td>
+              <td>${(r.pieces||[]).map(p=>`<span class="ptag">${p}</span>`).join('')}</td>
+              <td>${dfmt(r.archivedDate||dn(0))}</td>
+              <td>${r.archivedBy||'—'}</td>
+              <td><button class="btn bsm bs" onclick="restaurerRelance(${i})">↩ Restaurer</button></td>
+            </tr>`).join('')}
+          </tbody></table></div>`}
+    </div>`;
+}
+
+function restaurerRelance(i){
+  const r=archives[i];
+  if(!confirm('Restaurer ce dossier dans les relances ?'))return;
+  delete r.archived;delete r.archivedDate;delete r.archivedBy;
+  r.stat='ouvert';
+  relances.unshift(r);
+  archives.splice(i,1);
+  addLog('Restauration','Dossier '+r.client+' restauré');
+  renderArchives();renderTable();renderStats();
+}
+
+// ===== STATISTIQUES =====
+function renderStats2(){
+  const mois=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const now=new Date();
+
+  // Stats par collaborateur
+  const userStats=USERS.map(u=>({
+    name:u.name,ini:u.ini||u.initials,
+    crees:relances.filter(r=>r.cb===u.id).length,
+    traites:relances.filter(r=>r.ab===u.id&&r.stat==='fait').length,
+    enCours:relances.filter(r=>r.ab===u.id&&r.stat!=='fait').length,
+    emails:relances.filter(r=>r.ab===u.id).reduce((s,r)=>s+(r.tl||[]).filter(t=>t.type==='email').length,0),
+  }));
+
+  // Stats par mois (6 derniers mois)
+  const last6=Array.from({length:6},(_,i)=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-5+i,1);
+    return {label:mois[d.getMonth()]+' '+d.getFullYear().toString().slice(2),y:d.getFullYear(),m:d.getMonth()};
+  });
+
+  const maxUser=Math.max(...userStats.map(u=>u.crees),1);
+
+  document.getElementById('stats-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">👥 Performance par collaborateur</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>
+            ${['Collaborateur','Relances créées','Assignées','Traitées','Emails envoyés','Taux traitement'].map(h=>`<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border)">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>${userStats.map(u=>{
+            const taux=u.enCours+u.traites>0?Math.round(u.traites/(u.enCours+u.traites)*100):0;
+            return`<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:12px 14px"><div style="display:flex;align-items:center;gap:8px"><div class="av">${u.ini}</div><span style="font-size:13px;font-weight:500">${u.name}</span></div></td>
+              <td style="padding:12px 14px;font-weight:600;color:var(--accent)">${u.crees}</td>
+              <td style="padding:12px 14px">${u.enCours}</td>
+              <td style="padding:12px 14px;color:var(--success);font-weight:600">${u.traites}</td>
+              <td style="padding:12px 14px">${u.emails}</td>
+              <td style="padding:12px 14px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:8px;background:var(--surface2);border-radius:4px">
+                    <div style="width:${taux}%;height:100%;background:${taux>70?'var(--success)':taux>40?'var(--warning)':'var(--danger)'};border-radius:4px"></div>
+                  </div>
+                  <span style="font-size:12px;font-weight:600">${taux}%</span>
+                </div>
+              </td>
+            </tr>`;}).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="asec">
+        <div class="atitle">📈 Répartition par priorité</div>
+        ${['urgent','normal','attente'].map(p=>{
+          const n=relances.filter(r=>r.prio===p&&r.stat!=='fait').length;
+          const total=relances.filter(r=>r.stat!=='fait').length||1;
+          const pct=Math.round(n/total*100);
+          const colors={urgent:'var(--danger)',normal:'var(--accent)',attente:'var(--warning)'};
+          const labels={urgent:'Urgent',normal:'Normal',attente:'En attente'};
+          return`<div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:500">${labels[p]}</span>
+              <span style="font-size:13px;font-weight:600">${n} (${pct}%)</span>
+            </div>
+            <div style="height:10px;background:var(--surface2);border-radius:5px">
+              <div style="width:${pct}%;height:100%;background:${colors[p]};border-radius:5px"></div>
+            </div>
+          </div>`;}).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📊 Résumé global</div>
+        ${[
+          {l:'Total relances créées',v:relances.length,c:'var(--accent)'},
+          {l:'Traitées avec succès',v:relances.filter(r=>r.stat==='fait').length,c:'var(--success)'},
+          {l:'Archivées',v:archives.length,c:'var(--muted)'},
+          {l:'Emails envoyés',v:relances.reduce((s,r)=>s+(r.tl||[]).filter(t=>t.type==='email').length,0),c:'var(--accent)'},
+          {l:'Suivis prévention',v:prevData.length,c:'var(--warning)'},
+          {l:'Contrats flotte',v:flotteData.length,c:'var(--accent)'},
+        ].map(s=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px">${s.l}</span>
+            <span style="font-size:18px;font-weight:700;font-family:var(--fd);color:${s.c}">${s.v}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ===== LOGS D'ACTIVITE =====
+function renderLogs(){
+  // Collecter tous les événements depuis les timelines
+  const allEvents=[];
+  relances.forEach(r=>{
+    (r.tl||[]).forEach(t=>{
+      allEvents.push({date:t.date,by:t.by,action:t.action,detail:t.detail||'',client:r.client,module:'📋 Relance'});
+    });
+  });
+  activityLogs.forEach(l=>{
+    allEvents.push({date:l.date.split('T')[0],by:l.by,action:l.action,detail:l.detail,client:'',module:'🗂 Système'});
+  });
+  allEvents.sort((a,b)=>b.date.localeCompare(a.date));
+
+  document.getElementById('logs-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">📜 Journal d'activité (${allEvents.length} événements)</div>
+      ${allEvents.length===0?'<div class="empty">Aucune activité enregistrée</div>':`
+      <div class="tw"><table>
+        <thead><tr><th>Date</th><th>Module</th><th>Client</th><th>Action</th><th>Par</th></tr></thead>
+        <tbody>${allEvents.slice(0,100).map(e=>`
+          <tr>
+            <td style="font-size:12px;white-space:nowrap">${dfmt(e.date)}</td>
+            <td><span style="font-size:12px">${e.module}</span></td>
+            <td><span style="font-size:13px;font-weight:500">${e.client||'—'}</span></td>
+            <td><div style="font-size:13px">${e.action}</div>${e.detail?`<div style="font-size:11px;color:var(--muted)">${e.detail}</div>`:''}</td>
+            <td><div style="font-size:12px;color:var(--accent)">${e.by}</div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`}
+    </div>`;
+}
+
+// Mise à jour showPage
+function showPage(n){
+  const pages=['dashboard','relances','prevention','flotte','archives','stats','logs','admin','mdp'];
+  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',pages[i]===n));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+n).classList.add('active');
+  if(n==='dashboard')renderDashboard();
+  if(n==='admin')renderAdmin();
+  if(n==='prevention')renderPrevention();
+  if(n==='flotte')renderFlotte();
+  if(n==='archives')renderArchives();
+  if(n==='stats')renderStats2();
+  if(n==='logs')renderLogs();
+  if(n==='mdp'){
+    document.getElementById('mdp-id').value=cu?.id||'';
+    ['mdp-old','mdp-new','mdp-confirm'].forEach(id=>document.getElementById(id).value='');
+    ['mdp-error','mdp-success'].forEach(id=>document.getElementById(id).style.display='none');
+  }
+}
 </script>
+
 </body>
 </html>
