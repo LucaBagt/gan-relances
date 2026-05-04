@@ -1201,7 +1201,7 @@ async function saveFlotte(){
   if(!client||!ref){alert('Client et N° contrat obligatoires');return;}
   const aid=document.getElementById('fl-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const data={client,ref,nb:document.getElementById('fl-nb').value,echeance:document.getElementById('fl-ech').value,rappel:document.getElementById('fl-rappel').value,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim()};
+  const data={client,ref,nb:parseInt(document.getElementById('fl-nb').value)||0,echeance:document.getElementById('fl-ech').value||null,rappel:parseInt(document.getElementById('fl-rappel').value)||60,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim()};
   if(editFltId){
     const f=flotteData.find(x=>x.id===editFltId);
     Object.assign(f,{...data,assign:aid,abn:au?.name||cu.name,ech:data.echeance});
