@@ -578,8 +578,7 @@ async function connectUser(u){
   if(u.admin){document.getElementById('abadge').style.display='inline';document.getElementById('tadmin').style.display='inline-block';}
   buildFilters();buildPG();buildAssign();
   document.getElementById('fassign').value=cu.id;
-  addLog('Connexion','Connexion à l\'application','système');
-  showPage('dashboard');renderStats();checkEch();
+  showPage('relances');renderStats();checkEch();
 }
 
 // Restaurer la session au chargement
@@ -1540,9 +1539,6 @@ function showPage(n){
     ['mdp-old','mdp-new','mdp-confirm'].forEach(id=>document.getElementById(id).value='');
     ['mdp-error','mdp-success'].forEach(id=>document.getElementById(id).style.display='none');
   }
-}
-// fin
-}
 }
 </script>
 
