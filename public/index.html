@@ -660,8 +660,8 @@ function renderTable(){
   });
   const tb=document.getElementById('tbody');
   const em=document.getElementById('tempty');
-  if(!list.length){tb.innerHTML='';em.style.display='block';return;}
-  em.style.display='none';
+  if(!list.length){tb.innerHTML='';e
+  e
   const ce=r=>true; // Tout utilisateur peut traiter ou supprimer une tâche
   tb.innerHTML=list.map(r=>{
     const emails=r.tl.filter(t=>t.type==='email').length;
@@ -1542,6 +1542,7 @@ function showPage(n){
   }
 }
 // fin
+}
 }
 </script>
 
