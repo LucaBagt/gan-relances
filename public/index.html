@@ -148,6 +148,9 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 .pane{display:none}.pane.active{display:block}
 .empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
 .eok{color:var(--success);font-weight:500}.ew{color:var(--warning);font-weight:600}.el{color:var(--danger);font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:500;color:white;z-index:9999;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:320px}
+.toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -185,13 +188,18 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 
   <div class="main">
     <div class="ptabs">
-      <button class="ptab active" onclick="showPage('relances')">📋 Relances</button>
+      <button class="ptab active" onclick="showPage('dashboard')">🏠 Dashboard</button>
+      <button class="ptab" onclick="showPage('relances')">📋 Relances</button>
       <button class="ptab" onclick="showPage('prevention')">🔥 Prévention</button>
       <button class="ptab" onclick="showPage('flotte')">🚗 Flottes</button>
+      <button class="ptab" onclick="showPage('archives')">📁 Archives</button>
+      <button class="ptab" onclick="showPage('stats')">📊 Statistiques</button>
+      <button class="ptab" onclick="showPage('logs')">📜 Activité</button>
       <button class="ptab" onclick="showPage('admin')" id="tadmin" style="display:none">⚙️ Administration</button>
     </div>
 
-    <div id="pane-relances" class="pane active">
+    <div id="pane-dashboard" class="pane active"><div id="dashboard-content"></div></div>
+    <div id="pane-relances" class="pane">
       <div class="stats" id="stats"></div>
       <div class="toolbar">
         <div class="tleft">
@@ -219,6 +227,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
           </select>
         </div>
         <button class="btn bp" onclick="openModalRelance()">+ Nouvelle relance</button>
+        <button class="btn" onclick="exportExcel()" title="Exporter en Excel">📥 Export</button>
       </div>
       <div class="tw">
         <table>
@@ -233,6 +242,9 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     </div>
 
     <div id="pane-admin" class="pane"><div id="admin-content"></div></div>
+    <div id="pane-archives" class="pane"><div id="archives-content"></div></div>
+    <div id="pane-stats" class="pane"><div id="stats-content"></div></div>
+    <div id="pane-logs" class="pane"><div id="logs-content"></div></div>
     <div id="pane-prevention" class="pane"><div id="prev-content"></div></div>
     <div id="pane-flotte" class="pane"><div id="flotte-content"></div></div>
     <div id="pane-mdp" class="pane">
@@ -252,21 +264,22 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
-<!-- MODAL NOUVELLE RELANCE -->
+<!-- MODAL NOUVELLE/MODIFIER RELANCE -->
 <div class="overlay" id="mrelance">
   <div class="modal">
-    <div class="mtitle">Nouvelle relance</div>
-    <div class="msub">Renseignez les informations du dossier</div>
+    <div class="mtitle" id="mrelance-title">Nouvelle relance</div>
+    <div class="msub" id="mrelance-sub">Renseignez les informations du dossier</div>
     <div class="r2">
       <div class="field"><label>Client / Société *</label><input type="text" id="rc" placeholder="Nom du client"></div>
       <div class="field"><label>N° Contrat / Dossier</label><input type="text" id="rref" placeholder="Référence"></div>
     </div>
+    <div class="field"><label>Email client</label><input type="email" id="remail" placeholder="email@client.fr"></div>
     <div class="r3">
       <div class="field"><label>Priorité</label>
         <select id="rprio"><option value="urgent">🔴 Urgent</option><option value="normal" selected>🔵 Normal</option><option value="attente">🟡 En attente</option></select>
       </div>
-      <div class="field"><label>Délai (jours)</label>
-        <select id="rdelai"><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select>
+      <div class="field"><label>Échéance</label>
+        <input type="date" id="rech">
       </div>
       <div class="field"><label>Assigner à</label><select id="rassign"></select></div>
     </div>
@@ -274,7 +287,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div class="field"><label>Note interne</label><textarea id="rnote" placeholder="Informations complémentaires..."></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('mrelance')">Annuler</button>
-      <button class="btn bp" onclick="ajouterRelance()">Créer la relance →</button>
+      <button class="btn bp" id="mrelance-btn" onclick="ajouterRelance()">Créer la relance →</button>
     </div>
   </div>
 </div>
@@ -285,6 +298,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
     <div id="detail-content"></div>
     <div class="macts">
       <button class="btn" onclick="cm('mdetail')">Fermer</button>
+      <button class="btn" onclick="cm('mdetail');openModalRelance(cdid)">✏️ Modifier</button>
       <button class="btn bs" onclick="faitDetail()">✓ Marquer traité</button>
       <button class="btn bp" onclick="emailDetail()">✉ Relancer par email</button>
     </div>
@@ -332,10 +346,12 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
         </div>
       </div>
       <div class="field"><label>Assigner à</label><select id="pv-assign"></select></div>
-    <div class="field"><label>Note</label><textarea id="pv-note" placeholder="Observations..."></textarea></div>
-    <div class="macts">
-      <button class="btn" onclick="cm('mprev')">Annuler</button>
-      <button class="btn bp" onclick="savePrev()">Enregistrer →</button>
+      <div class="field"><label>Email client</label><input type="email" id="pv-email" placeholder="email@client.fr"></div>
+      <div class="field"><label>Note</label><textarea id="pv-note" placeholder="Observations..."></textarea></div>
+      <div class="macts">
+        <button class="btn" onclick="cm('mprev')">Annuler</button>
+        <button class="btn bp" onclick="savePrev()">Enregistrer →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -378,6 +394,7 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
       </div>
     </div>
     <div class="field"><label>Assigner à</label><select id="fl-assign"></select></div>
+    <div class="field"><label>Email client</label><input type="email" id="fl-email" placeholder="email@client.fr"></div>
     <div class="field"><label>Note</label><textarea id="fl-note" placeholder="Informations utiles sur le parc..."></textarea></div>
     <div class="macts">
       <button class="btn" onclick="cm('mflotte')">Annuler</button>
@@ -392,6 +409,26 @@ tbody td{padding:12px 13px;font-size:13px;vertical-align:middle}
 <script>
 
 let cu=null,cdid=null,ceid=null;
+
+const ETPLS={
+  'Permis de conduire':'je me permets de vous relancer concernant la transmission de votre permis de conduire (recto-verso) nécessaire à la finalisation de votre dossier.',
+  'Carte d\'identité':'je me permets de vous relancer concernant la copie de votre pièce d\'identité (recto-verso) indispensable pour la mise en place de votre contrat.',
+  'RIB / IBAN':'je me permets de vous relancer concernant votre relevé d\'identité bancaire (RIB/IBAN) nécessaire au prélèvement de vos cotisations.',
+  'Kbis':'je me permets de vous relancer concernant l\'extrait Kbis de votre société, document obligatoire pour l\'établissement de votre contrat professionnel.',
+  'Devis signé':'je me permets de vous relancer concernant la signature et le retour du devis que je vous ai adressé.',
+  'Lettre de devoir de conseil':'je me permets de vous relancer concernant la signature et le retour de la lettre de devoir de conseil jointe à votre dossier.',
+  'Carte grise':'je me permets de vous relancer concernant la copie de la carte grise du véhicule assuré.',
+  'Relevé d\'information':'je me permets de vous relancer concernant votre relevé d\'information auprès de votre précédent assureur.',
+  'PV de restitution':'je me permets de vous relancer concernant le procès-verbal de restitution nécessaire au retrait du véhicule de votre flotte.',
+  'Bilan comptable':'je me permets de vous relancer concernant votre bilan comptable nécessaire à la régularisation de votre contrat.',
+};
+
+function emailBody(pieces,delai){
+  const fp=pieces&&pieces[0];
+  const t=ETPLS[fp]||`je me permets de vous relancer concernant les documents suivants : ${(pieces||[]).join(', ')}.`;
+  const list=pieces&&pieces.length>1?'\n\nDocuments attendus :\n'+pieces.map(p=>'  — '+p).join('\n'):'';
+  return `Bonjour,\n\n${t}${list}\n\nSans retour de votre part sous ${delai||7} jours, nous pourrions être dans l'impossibilité de traiter votre dossier dans les meilleurs délais.\n\nRestant à votre disposition pour tout renseignement complémentaire.\n\nBien cordialement,\n\n${cu?.name||'Luca BAGATELLA'}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`;
+}
 function dn(d=0){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0];}
 function dfmt(d){return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
 
@@ -449,19 +486,8 @@ function showLoader(v){
 }
 
 function openChangeMdp(){
-  if(!cu){return;}
-  // Fermer le menu
-  // Attendre que le menu soit fermé puis ouvrir la modal
-  setTimeout(()=>{
-    document.getElementById('mdp-old').value='';
-    document.getElementById('mdp-new').value='';
-    document.getElementById('mdp-confirm').value='';
-    document.getElementById('mdp-error').style.display='none';
-    document.getElementById('mdp-success').style.display='none';
-    document.getElementById('mmdp-user').textContent='Connecté en tant que '+cu.name;
-    const m=document.getElementById('mmdp');
-    m.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
-  },100);
+  if(!cu)return;
+  showPage('mdp');
 }
 
 async function changerMdp(){
@@ -490,8 +516,36 @@ async function changerMdp(){
   }
 }
 
-  const m=document.getElementById('user-menu');
-  m.style.display=m.style.display==='none'?'block':'none';
+
+// ===== FILTRES MES/TOUS PREVENTION & FLOTTE =====
+function setPrevVue(v){
+  document.getElementById('pvtab-mes')?.classList.toggle('active',v==='mes');
+  document.getElementById('pvtab-all')?.classList.toggle('active',v==='all');
+  const sel=document.getElementById('prev-fassign');
+  if(sel)sel.value=v==='mes'?cu.id:'';
+  renderPrevention();
+}
+function setFltVue(v){
+  document.getElementById('flttab-mes')?.classList.toggle('active',v==='mes');
+  document.getElementById('flttab-all')?.classList.toggle('active',v==='all');
+  const sel=document.getElementById('flt-assign');
+  if(sel)sel.value=v==='mes'?cu.id:'';
+  renderFlotte();
+}
+
+// ===== EXPORT EXCEL =====
+function exportExcel(){
+  const rows=[['Client','Référence','Pièces','Priorité','Échéance','Créé par','Assigné à','Statut','Nb relances']];
+  relances.forEach(r=>{
+    rows.push([r.client,r.ref||'',r.pieces.join(', '),r.prio,r.ech||'',r.cbn,r.abn,r.stat,r.tl.filter(t=>t.type==='email').length]);
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='relances_gan_'+dn(0)+'.csv';
+  a.click();
+}
 
 function syncVueTabs(){
   const v=document.getElementById('fassign').value;
@@ -510,8 +564,13 @@ async function doLogin(){
   const id=document.getElementById('lu').value.trim().toUpperCase();
   const pass=document.getElementById('lp').value;
   if(!USERS.length)await loadAll();
-  const u=USERS.find(x=>x.id===id&&x.pass===pass);
+  const u=USERS.find(x=>x.id===id&&(x.pass===pass||x.mdp===pass||x.password===pass));
   if(!u){document.getElementById('lerr').style.display='block';return;}
+  localStorage.setItem('gan_session',JSON.stringify({id:u.id,pass:u.pass||u.mdp||u.password}));
+  await connectUser(u);
+}
+
+async function connectUser(u){
   cu=u;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
@@ -519,10 +578,24 @@ async function doLogin(){
   if(u.admin){document.getElementById('abadge').style.display='inline';document.getElementById('tadmin').style.display='inline-block';}
   buildFilters();buildPG();buildAssign();
   document.getElementById('fassign').value=cu.id;
-  renderTable();renderStats();checkEch();
+  addLog('Connexion','Connexion à l\'application','système');
+  showPage('dashboard');renderStats();checkEch();
+}
+
+// Restaurer la session au chargement
+async function restoreSession(){
+  try{
+    const sess=localStorage.getItem('gan_session');
+    if(!sess)return;
+    const {id,pass}=JSON.parse(sess);
+    if(!USERS.length)await loadAll();
+    const u=USERS.find(x=>x.id===id&&x.pass===pass);
+    if(u)await connectUser(u);
+  }catch(e){localStorage.removeItem('gan_session');}
 }
 
 function doLogout(){
+  localStorage.removeItem('gan_session');
   cu=null;
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').classList.remove('visible');
@@ -538,9 +611,9 @@ function buildFilters(){
   s.innerHTML='<option value="">Tous collaborateurs</option>';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;s.appendChild(o);});
 }
-function buildAssign(){
+function buildAssign(defaultId=null){
   const s=document.getElementById('rassign');s.innerHTML='';
-  USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if(u.id===cu.id)o.selected=true;s.appendChild(o);});
+  USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((defaultId||cu.id)===u.id)o.selected=true;s.appendChild(o);});
 }
 function buildPG(){
   document.getElementById('pgrid').innerHTML=PIECES.map(p=>`<label class="pcb"><input type="checkbox" value="${p}" onchange="this.closest('.pcb').classList.toggle('checked',this.checked)">${p}</label>`).join('');
@@ -604,7 +677,8 @@ function renderTable(){
       <td onclick="event.stopPropagation()">
         <div class="acts">
           <button class="btn bsm" onclick="openEmailD(${r.id})" title="Email">✉</button>
-          ${ce(r)?`<button class="btn bsm bs" onclick="marquerFait(${r.id})" title="Traité">✓</button><button class="btn bsm bd" onclick="suppRelance(${r.id})" title="Supprimer">✕</button>`:''}
+          <button class="btn bsm" onclick="event.stopPropagation();openModalRelance(${r.id})" title="Modifier">✏️</button>
+          ${ce(r)?`<button class="btn bsm bs" onclick="marquerFait(${r.id})" title="Traité">✓</button><button class="btn bsm" onclick="archiverRelance(${r.id})" title="Archiver" style="background:var(--surface2)">📁</button><button class="btn bsm bd" onclick="suppRelance(${r.id})" title="Supprimer">✕</button>`:''}
         </div>
       </td>
     </tr>`;
@@ -625,7 +699,11 @@ function openDetail(id){
       <div class="dmi"><div class="dmil">Échéance</div><div class="dmiv">${echLabel(r)}</div></div>
       <div class="dmi"><div class="dmil">Relances envoyées</div><div class="dmiv" style="color:var(--accent)">${r.tl.filter(t=>t.type==='email').length}</div></div>
       <div class="dmi"><div class="dmil">Créé par</div><div class="dmiv" style="font-size:12px">${r.cbn}</div></div>
-      <div class="dmi"><div class="dmil">Assigné à</div><div class="dmiv" style="font-size:12px;color:var(--success)">${r.abn}</div></div>
+      <div class="dmi"><div class="dmil">Assigné à</div><div class="dmiv">
+        <select onchange="reassignerRelance(${r.id},this.value)" style="font-size:12px;padding:4px 8px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:var(--fb);background:white;color:var(--success);font-weight:600">
+          ${USERS.map(u=>`<option value="${u.id}" ${u.id===r.ab?'selected':''}>${u.name}</option>`).join('')}
+        </select>
+      </div></div>
       <div class="dmi"><div class="dmil">Dernière action</div><div class="dmiv" style="font-size:12px">${r.tl.length?dfmt(r.tl[r.tl.length-1].date):'—'}</div></div>
     </div>
     <div style="margin-bottom:18px"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px">Pièces manquantes</div><div>${r.pieces.map(p=>`<span class="ptag" style="font-size:13px;padding:5px 11px">${p}</span>`).join('')}</div></div>
@@ -633,6 +711,16 @@ function openDetail(id){
     ${r.tl.map(t=>`<div class="tl-item"><div class="tl-dot tl-${t.type}">${icons[t.type]||'•'}</div><div class="tl-box"><div class="tl-top"><span class="tl-action">${t.action}</span><span class="tl-date">${dfmt(t.date)}</span></div>${t.detail?`<div class="tl-detail">${t.detail}</div>`:''}<div class="tl-by">par ${t.by}</div></div></div>`).join('')}
     <div class="note-row"><textarea id="ninput" placeholder="Ajouter une note interne..."></textarea><button class="btn bp bsm" onclick="ajouterNote(${r.id})" style="align-self:flex-end;white-space:nowrap">+ Note</button></div>`;
   openModal('mdetail');
+}
+
+async function reassignerRelance(id, newUserId){
+  const r=relances.find(x=>x.id===id);
+  const u=USERS.find(x=>x.id===newUserId);
+  if(!r||!u)return;
+  r.ab=newUserId;r.abn=u.name;
+  r.tl.push({type:'note',action:'Réassignation',detail:`Assigné à ${u.name}`,date:dn(0),by:cu.name});
+  await sbPatch('relances',id,{assigned_to:newUserId,assigned_to_name:u.name,timeline:r.tl});
+  openDetail(id);renderTable();
 }
 
 async function ajouterNote(id){
@@ -657,11 +745,30 @@ const MODAL_STYLE='position:fixed;top:0;left:0;width:100vw;height:100vh;backgrou
 function openModal(id){document.getElementById(id).style.cssText=MODAL_STYLE;}
 function cm(id){document.getElementById(id).style.cssText='';document.getElementById(id).classList.remove('open');}
 
-function openModalRelance(){
-  document.querySelectorAll('#pgrid input').forEach(cb=>{cb.checked=false;cb.closest('.pcb').classList.remove('checked');});
-  ['rc','rref','rnote'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rprio').value='normal';document.getElementById('rdelai').value='7';
-  buildAssign();openModal('mrelance');
+let editRelanceId=null;
+
+function openModalRelance(id=null){
+  editRelanceId=id;
+  const r=id?relances.find(x=>x.id===id):null;
+  // Titre et bouton
+  document.getElementById('mrelance-title').textContent=id?'Modifier la relance':'Nouvelle relance';
+  document.getElementById('mrelance-sub').textContent=id?'Modifiez les informations du dossier':'Renseignez les informations du dossier';
+  document.getElementById('mrelance-btn').textContent=id?'Enregistrer les modifications →':'Créer la relance →';
+  // Remplir les champs
+  document.getElementById('rc').value=r?.client||'';
+  document.getElementById('rref').value=r?.ref||'';
+  document.getElementById('remail').value=r?.email||'';
+  document.getElementById('rprio').value=r?.prio||'normal';
+  document.getElementById('rech').value=r?.ech||dn(7);
+  document.getElementById('rnote').value=r?.note||'';
+  // Pièces
+  document.querySelectorAll('#pgrid input').forEach(cb=>{
+    const checked=r?.pieces?.includes(cb.value)||false;
+    cb.checked=checked;
+    cb.closest('.pcb').classList.toggle('checked',checked);
+  });
+  buildAssign(r?.ab);
+  openModal('mrelance');
 }
 
 async function ajouterRelance(){
@@ -669,14 +776,32 @@ async function ajouterRelance(){
   if(!client){alert('Client obligatoire');return;}
   const pieces=Array.from(document.querySelectorAll('#pgrid input:checked')).map(cb=>cb.value);
   if(!pieces.length){alert('Sélectionnez au moins une pièce');return;}
-  const delai=parseInt(document.getElementById('rdelai').value);
+  const email=document.getElementById('remail').value.trim();
+  const ech=document.getElementById('rech').value||dn(7);
   const aid=document.getElementById('rassign').value;
   const au=USERS.find(u=>u.id===aid);
-  const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
-  const data={client,ref:document.getElementById('rref').value.trim(),pieces,priorite:document.getElementById('rprio').value,echeance:dn(delai),statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai,timeline:tl};
-  const res=await sbPost('relances',data);
-  if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
+
+  if(editRelanceId){
+    // MODIFICATION
+    const r=relances.find(x=>x.id===editRelanceId);
+    if(!r)return;
+    r.tl.push({type:'note',action:'Relance modifiée',detail:`Priorité: ${document.getElementById('rprio').value}, Pièces: ${pieces.join(', ')}`,date:dn(0),by:cu.name});
+    const updates={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:ech,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),timeline:r.tl};
+    await sbPatch('relances',editRelanceId,updates);
+    Object.assign(r,{...updates,prio:updates.priorite,ech:updates.echeance,ab:aid,abn:au?.name||cu.name});
+    addLog('Relance modifiée','Client : '+client);
+  }else{
+    // CREATION
+    const tl=[{type:'create',action:'Relance créée',detail:pieces.join(', '),date:dn(0),by:cu.name}];
+    const data={client,ref:document.getElementById('rref').value.trim(),email,pieces,priorite:document.getElementById('rprio').value,echeance:ech,statut:'ouvert',created_by:cu.id,created_by_name:cu.name,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('rnote').value.trim(),delai:7,timeline:tl};
+    const res=await sbPost('relances',data);
+    if(res&&res[0]){const r=res[0];relances.unshift({...r,prio:r.priorite,ech:r.echeance,stat:r.statut,cb:r.created_by,cbn:r.created_by_name,ab:r.assigned_to,abn:r.assigned_to_name,tl:r.timeline||[],pieces:r.pieces||[]});}
+    addLog('Relance créée','Client : '+client);
+  }
+  const msg=editRelanceId?'✅ Relance modifiée !':'✅ Relance créée !';
+  editRelanceId=null;
   cm('mrelance');renderTable();renderStats();
+  toast(msg);
 }
 
 async function marquerFait(id){
@@ -685,6 +810,8 @@ async function marquerFait(id){
     r.tl.push({type:'note',action:'Dossier traité',detail:'',date:dn(0),by:cu.name});
     await sbPatch('relances',id,{statut:'fait',timeline:r.tl});
     r.stat='fait';
+    addLog('Dossier traité','Client : '+r.client);
+    toast('✅ Dossier marqué traité !');
   }
   renderTable();renderStats();
 }
@@ -693,6 +820,7 @@ async function suppRelance(id){
   if(!confirm('Supprimer ?'))return;
   await sbDelete('relances',id);
   relances=relances.filter(r=>r.id!==id);
+  toast('🗑️ Relance supprimée','info');
   renderTable();renderStats();
 }
 
@@ -700,7 +828,7 @@ function openEmailD(id){
   const r=relances.find(x=>x.id===id);if(!r)return;
   ceid=id;
   document.getElementById('emailsub').textContent=`Relance pour ${r.client} — ${r.pieces.join(', ')}`;
-  document.getElementById('eto').value='';
+  document.getElementById('eto').value=r.email||'';
   document.getElementById('esubj').value=`Dossier ${r.client}${r.ref?' ('+r.ref+')':''} — Documents manquants`;
   document.getElementById('ebody').value=emailBody(r.pieces,r.delai);
   openModal('memail');
@@ -760,6 +888,9 @@ function checkEch(){
 }
 setInterval(checkEch,3600000);
 
+// Restaurer la session au chargement de la page
+loadAll().then(()=>restoreSession());
+
 // ===== PREVENTION =====
 let editPrevId=null;
 
@@ -775,9 +906,11 @@ function renderPrevention(){
   const search=document.getElementById('prev-search')?.value.toLowerCase()||'';
   const fstat=document.getElementById('prev-fstat')?.value||'';
   const ftype=document.getElementById('prev-ftype')?.value||'';
+  const fassign=document.getElementById('prev-fassign')?.value||'';
 
   let list=prevData.filter(x=>{
     if(search&&!x.client.toLowerCase().includes(search))return false;
+    if(fassign&&x.assign!==fassign)return false;
     if(ftype&&!x.types.includes(ftype))return false;
     const sg=statGlobal(x);
     const hasExpire=x.types.some(t=>{const td=x.typesData?.[t];return td?.stat==='recu'&&td?.expiry&&new Date(td.expiry)<new Date();});
@@ -819,6 +952,10 @@ function renderPrevention(){
     </div>
     <div class="toolbar">
       <div class="tleft">
+        <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
+          <button id="pvtab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setPrevVue('mes')">👤 Mes suivis</button>
+          <button id="pvtab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setPrevVue('all')">🌐 Tous</button>
+        </div>
         <input class="sinput" type="text" placeholder="🔍 Rechercher..." oninput="renderPrevention()" id="prev-search">
         <select class="fsel" onchange="renderPrevention()" id="prev-fstat">
           <option value="">Tous statuts</option>
@@ -834,6 +971,10 @@ function renderPrevention(){
           <option value="Thermographie">🌡️ Thermographie</option>
           <option value="Rapport sécurité incendie">🔥 Sécurité incendie</option>
           <option value="Exutoire de fumées">💨 Exutoire fumées</option>
+        </select>
+        <select class="fsel" onchange="renderPrevention()" id="prev-fassign">
+          <option value="">Tous collaborateurs</option>
+          ${USERS.map(u=>`<option value="${u.id}"${u.id===cu.id?' selected':''}>${u.name}</option>`).join('')}
         </select>
       </div>
       <button class="btn bp" onclick="openPrev()">+ Nouveau suivi</button>
@@ -883,6 +1024,7 @@ function openPrev(id=null){
   document.getElementById('pv-client').value=x?.client||'';
   document.getElementById('pv-ref').value=x?.ref||'';
   document.getElementById('pv-note').value=x?.note||'';
+  document.getElementById('pv-email').value=x?.email||'';
   // Réinitialiser toutes les checkboxes
   document.querySelectorAll('#mprev input[type=checkbox]').forEach(cb=>{
     cb.checked=false;cb.closest('.pcb').classList.remove('checked');
@@ -904,7 +1046,7 @@ async function savePrev(){
   if(!types.length){alert('Sélectionnez au moins un type de vérification');return;}
   const aid=document.getElementById('pv-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const data={client,ref:document.getElementById('pv-ref').value.trim(),types,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('pv-note').value.trim()};
+  const data={client,ref:document.getElementById('pv-ref').value.trim(),types,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('pv-note').value.trim(),email:document.getElementById('pv-email').value.trim()};
   if(editPrevId){
     const p=prevData.find(x=>x.id===editPrevId);
     if(!p.typesData)p.typesData={};
@@ -918,7 +1060,7 @@ async function savePrev(){
     if(res&&res[0])prevData.unshift({...res[0],types,typesData,assign:aid,abn:au?.name||cu.name});
   }
   cm('mprev');renderPrevention();
-}
+  toast(editPrevId?'✅ Suivi modifié !':'✅ Suivi créé !');
 
 async function recevoirType(id, type){
   const x=prevData.find(p=>p.id===id);if(!x)return;
@@ -955,9 +1097,10 @@ async function suppPrev(id){
 
 function emailPrev(id){
   const x=prevData.find(p=>p.id===id);if(!x)return;
-  const s=encodeURIComponent(`${x.client} — ${x.type} — Document demandé`);
-  const b=encodeURIComponent(`Bonjour,\n\nDans le cadre du suivi de vos obligations contractuelles, je me permets de vous relancer concernant la transmission du justificatif de ${x.type.toLowerCase()}.\n\nCe document est nécessaire pour garantir la validité de vos garanties assurantielles. Sans ce document, votre couverture pourrait être remise en cause en cas de sinistre.\n\nMerci de bien vouloir nous faire parvenir ce justificatif dans les meilleurs délais.\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
-  window.location.href=`mailto:?subject=${s}&body=${b}`;
+  const typesStr=(x.types||[]).join(', ');
+  const s=encodeURIComponent(`${x.client} — Documents prévention demandés`);
+  const b=encodeURIComponent(`Bonjour,\n\nDans le cadre du suivi de vos obligations contractuelles, je me permets de vous relancer concernant la transmission des justificatifs suivants :\n\n${(x.types||[]).map(t=>'  — '+t).join('\n')}\n\nCes documents sont nécessaires pour garantir la validité de vos garanties assurantielles. Sans ces documents, votre couverture pourrait être remise en cause en cas de sinistre.\n\nMerci de bien vouloir nous faire parvenir ces justificatifs dans les meilleurs délais.\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
+  window.location.href=`mailto:${x.email||''}?subject=${s}&body=${b}`;
 }
 
 // ===== FLOTTE =====
@@ -993,6 +1136,10 @@ function renderFlotte(){
     </div>
     <div class="toolbar">
       <div class="tleft">
+        <div style="display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:var(--rs);margin-right:6px">
+          <button id="flttab-mes" class="ptab active" style="padding:6px 14px;font-size:12px" onclick="setFltVue('mes')">👤 Mes contrats</button>
+          <button id="flttab-all" class="ptab" style="padding:6px 14px;font-size:12px" onclick="setFltVue('all')">🌐 Tous</button>
+        </div>
         <input class="sinput" type="text" placeholder="🔍 Rechercher..." oninput="renderFlotte()" id="flt-search">
         <select class="fsel" onchange="renderFlotte()" id="flt-assign">
           <option value="">Tous collaborateurs</option>
@@ -1040,6 +1187,7 @@ function openFlotte(id=null){
   document.getElementById('fl-ech').value=x?.ech||'';
   document.getElementById('fl-rappel').value=x?.rappel||'60';
   document.getElementById('fl-note').value=x?.note||'';
+  document.getElementById('fl-email').value=x?.email||'';
   const sel=document.getElementById('fl-assign');sel.innerHTML='';
   USERS.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=u.name;if((x?.assign||cu.id)===u.id)o.selected=true;sel.appendChild(o);});
   openModal('mflotte');
@@ -1051,14 +1199,17 @@ async function saveFlotte(){
   if(!client||!ref){alert('Client et N° contrat obligatoires');return;}
   const aid=document.getElementById('fl-assign').value;
   const au=USERS.find(u=>u.id===aid);
-  const data={client,ref,nb:document.getElementById('fl-nb').value,echeance:document.getElementById('fl-ech').value,rappel:document.getElementById('fl-rappel').value,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim()};
+  const email=document.getElementById('fl-email').value.trim();
+  const data={client,ref,nb:parseInt(document.getElementById('fl-nb').value)||0,echeance:document.getElementById('fl-ech').value||null,rappel:parseInt(document.getElementById('fl-rappel').value)||60,assigned_to:aid,assigned_to_name:au?.name||cu.name,note:document.getElementById('fl-note').value.trim(),email};
   if(editFltId){
     const f=flotteData.find(x=>x.id===editFltId);
     Object.assign(f,{...data,assign:aid,abn:au?.name||cu.name,ech:data.echeance});
     await sbPatch('flotte',editFltId,data);
+    toast('✅ Contrat modifié !');
   }else{
     const res=await sbPost('flotte',{...data,historique:[]});
     if(res&&res[0])flotteData.unshift({...res[0],assign:aid,abn:au?.name||cu.name,ech:data.echeance,historique:[]});
+    toast('✅ Contrat créé !');
   }
   cm('mflotte');renderFlotte();
 }
@@ -1094,26 +1245,303 @@ function emailFlotte(id){
   const d=x.ech?dfmt(x.ech):'prochainement';
   const s=encodeURIComponent(`${x.client} — Point flotte automobile — Échéance ${d}`);
   const b=encodeURIComponent(`Bonjour,\n\nJe me permets de vous contacter dans le cadre du suivi de votre contrat flotte automobile (réf. ${x.ref}).\n\nVotre contrat arrive à échéance le ${d}. Afin de préparer au mieux le renouvellement, il est nécessaire de procéder à l'état de votre parc véhicules (entrées, sorties, modifications).\n\nPourriez-vous me communiquer l'état actuel de votre parc ou me proposer un créneau pour en faire le point ensemble ?\n\nBien cordialement,\n\n${cu.name}\nAgent Général GAN Assurances\n9 Place du 11 Novembre 1918 — 31620 FRONTON`);
-  window.location.href=`mailto:?subject=${s}&body=${b}`;
+  window.location.href=`mailto:${x.email||''}?subject=${s}&body=${b}`;
 }
 
-// Mise à jour showPage pour les nouveaux modules
+// ===== LOGS =====
+let activityLogs=[];
+// ===== TOAST NOTIFICATIONS =====
+function toast(msg, type='success'){
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+// ===== RECHARGEMENT AUTO (toutes les 2 minutes) =====
+setInterval(async()=>{
+  if(!cu)return;
+  const before=relances.length;
+  await loadAll();
+  if(relances.length!==before){renderTable();renderStats();toast('🔄 Données mises à jour','info');}
+},120000);
+
+function addLog(action,detail,module='relances'){
+  activityLogs.unshift({date:new Date().toISOString(),by:cu?.name||'?',action,detail,module});
+  if(activityLogs.length>500)activityLogs=activityLogs.slice(0,500);
+}
+
+// ===== ARCHIVES =====
+let archives=[];
+
+function archiverRelance(id){
+  const r=relances.find(x=>x.id===id);
+  if(!r)return;
+  r.archived=true;
+  r.archivedDate=dn(0);
+  r.archivedBy=cu.name;
+  archives.unshift({...r,type:'relance'});
+  relances=relances.filter(x=>x.id!==id);
+  addLog('Archivage','Dossier '+r.client+' archivé','relances');
+  renderTable();renderStats();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const today=dn(0);
+  const urgentes=relances.filter(r=>r.stat!=='fait'&&r.prio==='urgent');
+  const echues=relances.filter(r=>r.stat!=='fait'&&isEch(r));
+  const aujRelances=relances.filter(r=>r.ech===today&&r.stat!=='fait');
+  const prevExp=prevData.filter(x=>x.types.some(t=>{const td=x.typesData?.[t];return td?.expiry&&new Date(td.expiry)<new Date();}));
+  const prevBientot=prevData.filter(x=>x.types.some(t=>{const td=x.typesData?.[t];if(!td?.expiry)return false;const d=Math.ceil((new Date(td.expiry)-new Date())/86400000);return d>=0&&d<=30;}));
+  const flotteAlert=flotteData.filter(x=>x.ech&&Math.ceil((new Date(x.ech)-new Date())/86400000)<=parseInt(x.rappel||60));
+  const mesRelances=relances.filter(r=>r.ab===cu.id&&r.stat!=='fait');
+
+  document.getElementById('dashboard-content').innerHTML=`
+    <div style="margin-bottom:20px">
+      <div style="font-family:var(--fd);font-size:22px;font-weight:700;margin-bottom:4px">Bonjour ${cu.name.split(' ')[0]} 👋</div>
+      <div style="font-size:13px;color:var(--muted)">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:24px">
+      <div class="sc sb" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${relances.filter(r=>r.stat!=='fait').length}</div><div class="sl2">Relances en cours</div></div>
+      <div class="sc sr" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${urgentes.length}</div><div class="sl2">Urgentes</div></div>
+      <div class="sc so" style="cursor:pointer" onclick="showPage('relances')"><div class="sn">${echues.length}</div><div class="sl2">Échues</div></div>
+      <div class="sc" style="cursor:pointer" onclick="showPage('prevention')"><div class="sn" style="color:var(--danger)">${prevExp.length}</div><div class="sl2">Préventions expirées</div></div>
+      <div class="sc" style="cursor:pointer" onclick="showPage('flotte')"><div class="sn" style="color:var(--warning)">${flotteAlert.length}</div><div class="sl2">Flottes à traiter</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <div class="asec">
+        <div class="atitle">⚡ Mes relances urgentes</div>
+        ${mesRelances.filter(r=>r.prio==='urgent'||isEch(r)).length===0
+          ?'<div class="empty" style="padding:20px">✅ Aucune urgence !</div>'
+          :mesRelances.filter(r=>r.prio==='urgent'||isEch(r)).slice(0,5).map(r=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)" onclick="showPage('relances')" style="cursor:pointer">
+              <span class="badge b${r.prio[0]}">${r.prio}</span>
+              <div style="flex:1"><div style="font-weight:600;font-size:13px">${r.client}</div><div style="font-size:11px;color:var(--muted)">${r.pieces.join(', ')}</div></div>
+              <div style="font-size:11px">${echLabel(r)}</div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📅 Échéances du jour</div>
+        ${[...aujRelances.map(r=>({label:r.client,sub:'Relance — '+r.pieces.join(', '),badge:'📋',module:'relances'})),
+           ...flotteAlert.filter(x=>x.ech===today).map(x=>({label:x.client,sub:'Flotte — '+x.ref,badge:'🚗',module:'flotte'})),
+           ...prevBientot.map(x=>({label:x.client,sub:'Prévention — expire bientôt',badge:'🔥',module:'prevention'}))
+          ].length===0
+          ?'<div class="empty" style="padding:20px">✅ Rien à traiter aujourd\'hui !</div>'
+          :[...aujRelances.map(r=>({label:r.client,sub:'Relance — '+r.pieces.join(', '),badge:'📋',module:'relances'})),
+             ...flotteAlert.filter(x=>x.ech===today).map(x=>({label:x.client,sub:'Flotte — '+x.ref,badge:'🚗',module:'flotte'})),
+             ...prevBientot.map(x=>({label:x.client,sub:'Prévention — expire bientôt',badge:'🔥',module:'prevention'}))
+            ].slice(0,6).map(item=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showPage('${item.module}')">
+              <span style="font-size:18px">${item.badge}</span>
+              <div><div style="font-weight:600;font-size:13px">${item.label}</div><div style="font-size:11px;color:var(--muted)">${item.sub}</div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">🔥 Préventions expirées ou bientôt</div>
+        ${[...prevExp,...prevBientot].length===0
+          ?'<div class="empty" style="padding:20px">✅ Tout est à jour !</div>'
+          :[...prevExp,...prevBientot].slice(0,5).map(x=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showPage('prevention')">
+              <div style="flex:1"><div style="font-weight:600;font-size:13px">${x.client}</div><div style="font-size:11px;color:var(--muted)">${x.types.join(', ')}</div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📜 Dernières actions</div>
+        ${activityLogs.length===0
+          ?'<div class="empty" style="padding:20px">Aucune activité récente</div>'
+          :activityLogs.slice(0,5).map(l=>`
+            <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">${l.action}</span><span style="font-size:11px;color:var(--muted)">${dfmt(l.date.split('T')[0])}</span></div>
+              <div style="font-size:12px;color:var(--muted)">${l.detail} — par ${l.by}</div>
+            </div>`).join('')}
+      </div>
+
+    </div>`;
+}
+
+// ===== ARCHIVES =====
+function renderArchives(){
+  document.getElementById('archives-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">📁 Dossiers archivés (${archives.length})</div>
+      ${archives.length===0
+        ?'<div class="empty">Aucun dossier archivé</div>'
+        :`<div class="tw"><table>
+          <thead><tr><th>Client</th><th>Pièces</th><th>Archivé le</th><th>Par</th><th>Actions</th></tr></thead>
+          <tbody>${archives.map((r,i)=>`
+            <tr>
+              <td><div class="cn">${r.client}</div><div class="cr">${r.ref||'—'}</div></td>
+              <td>${(r.pieces||[]).map(p=>`<span class="ptag">${p}</span>`).join('')}</td>
+              <td>${dfmt(r.archivedDate||dn(0))}</td>
+              <td>${r.archivedBy||'—'}</td>
+              <td><button class="btn bsm bs" onclick="restaurerRelance(${i})">↩ Restaurer</button></td>
+            </tr>`).join('')}
+          </tbody></table></div>`}
+    </div>`;
+}
+
+function restaurerRelance(i){
+  const r=archives[i];
+  if(!confirm('Restaurer ce dossier dans les relances ?'))return;
+  delete r.archived;delete r.archivedDate;delete r.archivedBy;
+  r.stat='ouvert';
+  relances.unshift(r);
+  archives.splice(i,1);
+  addLog('Restauration','Dossier '+r.client+' restauré');
+  renderArchives();renderTable();renderStats();
+}
+
+// ===== STATISTIQUES =====
+function renderStats2(){
+  const mois=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const now=new Date();
+
+  // Stats par collaborateur
+  const userStats=USERS.map(u=>({
+    name:u.name,ini:u.ini||u.initials,
+    crees:relances.filter(r=>r.cb===u.id).length,
+    traites:relances.filter(r=>r.ab===u.id&&r.stat==='fait').length,
+    enCours:relances.filter(r=>r.ab===u.id&&r.stat!=='fait').length,
+    emails:relances.filter(r=>r.ab===u.id).reduce((s,r)=>s+(r.tl||[]).filter(t=>t.type==='email').length,0),
+  }));
+
+  // Stats par mois (6 derniers mois)
+  const last6=Array.from({length:6},(_,i)=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-5+i,1);
+    return {label:mois[d.getMonth()]+' '+d.getFullYear().toString().slice(2),y:d.getFullYear(),m:d.getMonth()};
+  });
+
+  const maxUser=Math.max(...userStats.map(u=>u.crees),1);
+
+  document.getElementById('stats-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">👥 Performance par collaborateur</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>
+            ${['Collaborateur','Relances créées','Assignées','Traitées','Emails envoyés','Taux traitement'].map(h=>`<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border)">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>${userStats.map(u=>{
+            const taux=u.enCours+u.traites>0?Math.round(u.traites/(u.enCours+u.traites)*100):0;
+            return`<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:12px 14px"><div style="display:flex;align-items:center;gap:8px"><div class="av">${u.ini}</div><span style="font-size:13px;font-weight:500">${u.name}</span></div></td>
+              <td style="padding:12px 14px;font-weight:600;color:var(--accent)">${u.crees}</td>
+              <td style="padding:12px 14px">${u.enCours}</td>
+              <td style="padding:12px 14px;color:var(--success);font-weight:600">${u.traites}</td>
+              <td style="padding:12px 14px">${u.emails}</td>
+              <td style="padding:12px 14px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:8px;background:var(--surface2);border-radius:4px">
+                    <div style="width:${taux}%;height:100%;background:${taux>70?'var(--success)':taux>40?'var(--warning)':'var(--danger)'};border-radius:4px"></div>
+                  </div>
+                  <span style="font-size:12px;font-weight:600">${taux}%</span>
+                </div>
+              </td>
+            </tr>`;}).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="asec">
+        <div class="atitle">📈 Répartition par priorité</div>
+        ${['urgent','normal','attente'].map(p=>{
+          const n=relances.filter(r=>r.prio===p&&r.stat!=='fait').length;
+          const total=relances.filter(r=>r.stat!=='fait').length||1;
+          const pct=Math.round(n/total*100);
+          const colors={urgent:'var(--danger)',normal:'var(--accent)',attente:'var(--warning)'};
+          const labels={urgent:'Urgent',normal:'Normal',attente:'En attente'};
+          return`<div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:500">${labels[p]}</span>
+              <span style="font-size:13px;font-weight:600">${n} (${pct}%)</span>
+            </div>
+            <div style="height:10px;background:var(--surface2);border-radius:5px">
+              <div style="width:${pct}%;height:100%;background:${colors[p]};border-radius:5px"></div>
+            </div>
+          </div>`;}).join('')}
+      </div>
+
+      <div class="asec">
+        <div class="atitle">📊 Résumé global</div>
+        ${[
+          {l:'Total relances créées',v:relances.length,c:'var(--accent)'},
+          {l:'Traitées avec succès',v:relances.filter(r=>r.stat==='fait').length,c:'var(--success)'},
+          {l:'Archivées',v:archives.length,c:'var(--muted)'},
+          {l:'Emails envoyés',v:relances.reduce((s,r)=>s+(r.tl||[]).filter(t=>t.type==='email').length,0),c:'var(--accent)'},
+          {l:'Suivis prévention',v:prevData.length,c:'var(--warning)'},
+          {l:'Contrats flotte',v:flotteData.length,c:'var(--accent)'},
+        ].map(s=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px">${s.l}</span>
+            <span style="font-size:18px;font-weight:700;font-family:var(--fd);color:${s.c}">${s.v}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ===== LOGS D'ACTIVITE =====
+function renderLogs(){
+  // Collecter tous les événements depuis les timelines
+  const allEvents=[];
+  relances.forEach(r=>{
+    (r.tl||[]).forEach(t=>{
+      allEvents.push({date:t.date,by:t.by,action:t.action,detail:t.detail||'',client:r.client,module:'📋 Relance'});
+    });
+  });
+  activityLogs.forEach(l=>{
+    allEvents.push({date:l.date.split('T')[0],by:l.by,action:l.action,detail:l.detail,client:'',module:'🗂 Système'});
+  });
+  allEvents.sort((a,b)=>b.date.localeCompare(a.date));
+
+  document.getElementById('logs-content').innerHTML=`
+    <div class="asec">
+      <div class="atitle">📜 Journal d'activité (${allEvents.length} événements)</div>
+      ${allEvents.length===0?'<div class="empty">Aucune activité enregistrée</div>':`
+      <div class="tw"><table>
+        <thead><tr><th>Date</th><th>Module</th><th>Client</th><th>Action</th><th>Par</th></tr></thead>
+        <tbody>${allEvents.slice(0,100).map(e=>`
+          <tr>
+            <td style="font-size:12px;white-space:nowrap">${dfmt(e.date)}</td>
+            <td><span style="font-size:12px">${e.module}</span></td>
+            <td><span style="font-size:13px;font-weight:500">${e.client||'—'}</span></td>
+            <td><div style="font-size:13px">${e.action}</div>${e.detail?`<div style="font-size:11px;color:var(--muted)">${e.detail}</div>`:''}</td>
+            <td><div style="font-size:12px;color:var(--accent)">${e.by}</div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`}
+    </div>`;
+}
+
+// Mise à jour showPage
 function showPage(n){
-  const pages=['relances','prevention','flotte','admin','mdp'];
+  const pages=['dashboard','relances','prevention','flotte','archives','stats','logs','admin','mdp'];
   document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',pages[i]===n));
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+n).classList.add('active');
+  if(n==='dashboard')renderDashboard();
   if(n==='admin')renderAdmin();
   if(n==='prevention')renderPrevention();
   if(n==='flotte')renderFlotte();
+  if(n==='archives')renderArchives();
+  if(n==='stats')renderStats2();
+  if(n==='logs')renderLogs();
   if(n==='mdp'){
     document.getElementById('mdp-id').value=cu?.id||'';
-    document.getElementById('mdp-old').value='';
-    document.getElementById('mdp-new').value='';
-    document.getElementById('mdp-confirm').value='';
-    document.getElementById('mdp-error').style.display='none';
-    document.getElementById('mdp-success').style.display='none';
+    ['mdp-old','mdp-new','mdp-confirm'].forEach(id=>document.getElementById(id).value='');
+    ['mdp-error','mdp-success'].forEach(id=>document.getElementById(id).style.display='none');
   }
+}
+// fin
 }
 </script>
 
